@@ -35,3 +35,6 @@ plt.ylabel("Pourcentage d'erreurs sur les données de test", fontsize=30)
 plt.xlabel("Nombre d'itérations dans l'entraînement", fontsize=30)
 plt.grid(True)
 plt.show()
+
+index.close()
+data.close()
