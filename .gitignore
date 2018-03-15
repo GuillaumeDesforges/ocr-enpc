@@ -1,6 +1,7 @@
 # ========= Project ignore =========
 
-data
+data/
+**/Models/
 
 # ============ Python ==============
 
