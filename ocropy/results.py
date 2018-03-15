@@ -30,10 +30,16 @@ print("L'erreur minimale est de "+ str(min(error)) +"%, atteinte pour " + str(in
 
 plt.figure()
 plt.plot(indexes,error)
-plt.ylim(0, 60)
-plt.xlim(1000,max(indexes))
+plt.ylim(0, 80)
+plt.xlim(3000,max(indexes))
 plt.legend(fontsize=100)
 plt.ylabel("Pourcentage d'erreurs sur les données de test", fontsize=30)
 plt.xlabel("Nombre d'itérations dans l'entraînement", fontsize=30)
 plt.grid(True)
 plt.show()
+<<<<<<< HEAD:ocropy/results.py
+=======
+
+index.close()
+data.close()
+>>>>>>> b6828cefad94d0d93c516b2c3a1affb4f51cc3d9:results.py

@@ -172,6 +172,21 @@ On peut ajouter \texttt{-C2} pour une contextualisation des erreurs. \\
 Sur ce premier entraînement sans préparations, on obtient une erreur de l'ordre de 27\% au bout de 12 000 itérations ce qui est extrêmement mauvais. En effet, l'ensemble des caractères sortant de l'ordinaire ne sont pas reconnus.
 
 \subsubsection{Entraînement avec les caractères spéciaux}
+% TODO modifier
+\begin{table}[!h]
+    \centering
+    \begin{tabular}{|l|l|lc|l|l|}
+        \hline
+        \multicolumn{6}{|c|}{\cellcolor[gray]{0.8}Statistics of the model}                   \\ \hline
+        \multicolumn{3}{|l|}{errors}    & \multicolumn{3}{c|}{329}      \\ \hline
+        \multicolumn{3}{|l|}{missing}   & \multicolumn{3}{c|}{35}       \\ \hline
+        \multicolumn{3}{|l|}{total}     & \multicolumn{3}{c|}{3547}     \\ \hline
+        \multicolumn{3}{|l|}{err}       & \multicolumn{3}{c|}{9.275 \%} \\ \hline
+        \multicolumn{3}{|l|}{errnomiss} & \multicolumn{3}{c|}{8.289 \%} \\ \hline
+    \end{tabular}
+    \caption{Résumé de la commande \texttt{ocropus-errs}}
+    \label{t1}
+\end{table}
 
 Afin d'intégrer les caractères spéciaux à la résolution, la méthode est de les ajouter à la liste des caractères, stockée dans \texttt{char.py}. C'est ce que nous avons fait, mais cela n'a rien changé. Nous avons compris par la suite que nos modifications effectuées étaient correctes, mais qu'il faut relancer la commande d'installation pour les prendre en compte ... \\
 \texttt{sudo python setup.py install} \\
