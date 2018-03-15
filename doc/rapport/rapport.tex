@@ -90,7 +90,14 @@
 \appendix
 \newpage 
 
+<<<<<<< HEAD:doc/rapport/rapport.tex
 \section{Introduction}
+=======
+
+\newpage 
+
+\part{Introduction}
+>>>>>>>  Maj rapport:Rapport/Rapport.tex
 
 L'objectif de ce projet est de tester différentes méthodes de reconnaissance de texte pour des manuscrits anciens écrits en vieux français. Ces manuscrits sont souvent très difficiles à lire, même pour des initiés. Il s'agit donc d'automatiser une tâche déjà dure pour l'homme.
 
@@ -152,7 +159,11 @@ On peut également visualiser les étapes avec la commande: \\
 
 \begin{figure}[!h] 
     \center
+<<<<<<< HEAD:doc/rapport/rapport.tex
     \includegraphics[width=8cm]{screen_output.png}
+=======
+    \includegraphics[width=8cm]{../Screenshots/screen_output.png}
+>>>>>>>  Maj rapport:Rapport/Rapport.tex
     \caption{Output d'une itération de l'entraînement}
     \label{API}
 \end{figure}
@@ -206,7 +217,11 @@ Pour résoudre ce problème nous avons implémenté un script \texttt{Python} re
 
 \begin{figure}[!h] 
     \center
+<<<<<<< HEAD:doc/rapport/rapport.tex
     \includegraphics[width=10cm]{error_normalized.png}
+=======
+    \includegraphics[width=10cm]{../Screenshots/error_normalized.png}
+>>>>>>>  Maj rapport:Rapport/Rapport.tex
     \caption{Évolution de l'erreur sur les données normalisées.}
     \label{err_norm}
 \end{figure}
@@ -266,7 +281,14 @@ On distingue 3 types d'erreurs:
 % TODO
 
 
+<<<<<<< HEAD:doc/rapport/rapport.tex
 \subsubsection{Paramètres utiles}
+=======
+
+\section{Modification des paramètres d'entraînement}
+
+\subsection{Commandes utiles}
+>>>>>>>  Maj rapport:Rapport/Rapport.tex
 
 Pour modifier l'apprentissage, on peut ajouter une des lignes suivantes à la fin de la commande pour lancer l'entraînement, afin d'en modifier les propriétés. \\
 \noindent \texttt{--ntrain <Number>} permet de modifier le nombre d'itérations réalisées dans l'entraînement. Plus ce nombre est grand, meilleur sera le résultat du réseau. \\
@@ -274,6 +296,7 @@ Pour modifier l'apprentissage, on peut ajouter une des lignes suivantes à la fi
 \texttt{--lrate <Number>} permet de modifier la vitesse d'apprentissage. \\ (\textit{learning rate}). Un de nos premiers objectifs sera de trouver une bonne valeur de ce paramètre. \\
 \texttt{--hiddensize <Number>} permet de modifier un des paramètres de la taille des matrices de notre réseau de neurones. Nous nous intéresserons également à son optimisation. \\
 
+<<<<<<< HEAD:doc/rapport/rapport.tex
 ocropus-rtrain -c train/*/*.gt.txt test/*/*.gt.txt -o test7 train/*/*.bin.png --ntrain 200000 --savefreq 1000
 
 \subsubsection{Commandes bash utiles}
@@ -315,3 +338,10 @@ ocropus-rtrain -c train/*/*.gt.txt test/*/*.gt.txt -o test7 train/*/*.bin.png --
 
 \end{document}
 
+=======
+\subsection{Modification de la vitesse d'apprentissage}
+
+\subsection{Modification de la taille du réseau}
+
+\end{document}
+>>>>>>>  Maj rapport:Rapport/Rapport.tex

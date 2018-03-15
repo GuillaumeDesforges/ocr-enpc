@@ -1,0 +1,20 @@
+\contentsline {part}{I\hspace {1em}Introduction}{3}{part.1}
+\contentsline {part}{II\hspace {1em}Base th\IeC {\'e}oriques et \IeC {\'e}tat de l'art}{3}{part.2}
+\contentsline {part}{III\hspace {1em}Reconnaissance avec ocropy}{3}{part.3}
+\contentsline {section}{\numberline {A}Avant-propos}{3}{appendix.A}
+\contentsline {subsection}{\numberline {A.1}Pr\IeC {\'e}sentation}{3}{subsection.A.1}
+\contentsline {subsection}{\numberline {A.2}Principe g\IeC {\'e}n\IeC {\'e}ral}{4}{subsection.A.2}
+\contentsline {section}{\numberline {B}Premiers essais}{4}{appendix.B}
+\contentsline {subsection}{\numberline {B.1}Pr\IeC {\'e}paration des donn\IeC {\'e}es}{4}{subsection.B.1}
+\contentsline {subsection}{\numberline {B.2}Commandes basiques}{4}{subsection.B.2}
+\contentsline {subsection}{\numberline {B.3}Entra\IeC {\^\i }nement avec les caract\IeC {\`e}res sp\IeC {\'e}ciaux}{5}{subsection.B.3}
+\contentsline {subsubsection}{\numberline {B.3.1}Principe}{5}{subsubsection.B.3.1}
+\contentsline {subsubsection}{\numberline {B.3.2}R\IeC {\'e}sultats}{5}{subsubsection.B.3.2}
+\contentsline {section}{\numberline {C}Am\IeC {\'e}lioration des r\IeC {\'e}sultats par modification des donn\IeC {\'e}es}{6}{appendix.C}
+\contentsline {subsection}{\numberline {C.1}Premi\IeC {\`e}re normalisation}{6}{subsection.C.1}
+\contentsline {subsection}{\numberline {C.2}Analyse des premiers mod\IeC {\`e}les normalis\IeC {\'e}s}{6}{subsection.C.2}
+\contentsline {subsection}{\numberline {C.3}Am\IeC {\'e}lioration de la normalisation}{8}{subsection.C.3}
+\contentsline {section}{\numberline {D}Modification des param\IeC {\`e}tres d'entra\IeC {\^\i }nement}{8}{appendix.D}
+\contentsline {subsection}{\numberline {D.1}Commandes utiles}{8}{subsection.D.1}
+\contentsline {subsection}{\numberline {D.2}Modification de la vitesse d'apprentissage}{8}{subsection.D.2}
+\contentsline {subsection}{\numberline {D.3}Modification de la taille du r\IeC {\'e}seau}{8}{subsection.D.3}
