@@ -1,0 +1,14 @@
+\BOOKMARK [1][-]{appendix.A}{Introduction}{}% 1
+\BOOKMARK [1][-]{appendix.B}{Base théoriques et état de l'art}{}% 2
+\BOOKMARK [1][-]{appendix.C}{Reconnaissance\040avec\040ocropy}{}% 3
+\BOOKMARK [2][-]{subsection.C.1}{Présentation}{appendix.C}% 4
+\BOOKMARK [2][-]{subsection.C.2}{Entraînement}{appendix.C}% 5
+\BOOKMARK [2][-]{subsection.C.3}{Premiers\040essais}{appendix.C}% 6
+\BOOKMARK [3][-]{subsubsection.C.3.1}{Préparation des données}{subsection.C.3}% 7
+\BOOKMARK [3][-]{subsubsection.C.3.2}{Commandes\040basiques}{subsection.C.3}% 8
+\BOOKMARK [3][-]{subsubsection.C.3.3}{Entraînement avec les caractères spéciaux}{subsection.C.3}% 9
+\BOOKMARK [3][-]{subsubsection.C.3.4}{Premières normalisation}{subsection.C.3}% 10
+\BOOKMARK [3][-]{subsubsection.C.3.5}{Analyse des premiers modèles normalisés}{subsection.C.3}% 11
+\BOOKMARK [3][-]{subsubsection.C.3.6}{Amélioration de la normalisation}{subsection.C.3}% 12
+\BOOKMARK [3][-]{subsubsection.C.3.7}{Paramètres utiles}{subsection.C.3}% 13
+\BOOKMARK [3][-]{subsubsection.C.3.8}{Commandes\040bash\040utiles}{subsection.C.3}% 14

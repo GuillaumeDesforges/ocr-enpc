@@ -1,0 +1,15 @@
+\babel@toc {french}{}
+\contentsline {section}{\numberline {A}Introduction}{3}{appendix.A}
+\contentsline {section}{\numberline {B}Base théoriques et état de l'art}{3}{appendix.B}
+\contentsline {section}{\numberline {C}Reconnaissance avec ocropy}{3}{appendix.C}
+\contentsline {subsection}{\numberline {C.1}Présentation}{3}{subsection.C.1}
+\contentsline {subsection}{\numberline {C.2}Entraînement}{3}{subsection.C.2}
+\contentsline {subsection}{\numberline {C.3}Premiers essais}{4}{subsection.C.3}
+\contentsline {subsubsection}{\numberline {C.3.1}Préparation des données}{4}{subsubsection.C.3.1}
+\contentsline {subsubsection}{\numberline {C.3.2}Commandes basiques}{4}{subsubsection.C.3.2}
+\contentsline {subsubsection}{\numberline {C.3.3}Entraînement avec les caractères spéciaux}{5}{subsubsection.C.3.3}
+\contentsline {subsubsection}{\numberline {C.3.4}Premières normalisation}{5}{subsubsection.C.3.4}
+\contentsline {subsubsection}{\numberline {C.3.5}Analyse des premiers modèles normalisés}{5}{subsubsection.C.3.5}
+\contentsline {subsubsection}{\numberline {C.3.6}Amélioration de la normalisation}{7}{subsubsection.C.3.6}
+\contentsline {subsubsection}{\numberline {C.3.7}Paramètres utiles}{7}{subsubsection.C.3.7}
+\contentsline {subsubsection}{\numberline {C.3.8}Commandes bash utiles}{7}{subsubsection.C.3.8}
