@@ -18,7 +18,7 @@ data = codecs.open('results.txt', 'r', encoding='utf-8')
 
 errors_dic={}
 for line in index:
-    indexes.append(int(line[12:-10]))
+    indexes.append(int(line[13:-10]))
 
 print(indexes)
     
@@ -37,9 +37,6 @@ plt.ylabel("Pourcentage d'erreurs sur les données de test", fontsize=30)
 plt.xlabel("Nombre d'itérations dans l'entraînement", fontsize=30)
 plt.grid(True)
 plt.show()
-<<<<<<< HEAD:ocropy/results.py
-=======
 
 index.close()
 data.close()
->>>>>>> b6828cefad94d0d93c516b2c3a1affb4f51cc3d9:results.py
