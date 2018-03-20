@@ -3,11 +3,11 @@
 import numpy as np
 import os
 import codecs
-import unicodedata
 import matplotlib.pyplot as plt
 
-path = "C:\\Users\\teovi\\Documents\\ocropy"
-print("Script deprecated : path was hard set in the script, change it or do not use this script")
+# path = "C:\\Users\\teovi\\Documents\\ocropy"
+path = "C:\\Users\\teovi\\Documents\\IMI\Projet ML\ocr-enpc\ocropy\Models\Default_normalized"
+
 os.chdir(path)
 
 indexes=[]
@@ -18,7 +18,7 @@ data = codecs.open('results.txt', 'r', encoding='utf-8')
 
 errors_dic={}
 for line in index:
-    indexes.append(int(line[12:-10]))
+    indexes.append(int(line[13:-11]))  #Mettre -10 à la place de -11 parfois
 
 print(indexes)
     
@@ -30,16 +30,18 @@ print("L'erreur minimale est de "+ str(min(error)) +"%, atteinte pour " + str(in
 
 plt.figure()
 plt.plot(indexes,error)
-plt.ylim(0, 80)
-plt.xlim(3000,max(indexes))
+plt.ylim(0, max(error))
+plt.xlim(min(indexes),105000)
 plt.legend(fontsize=100)
 plt.ylabel("Pourcentage d'erreurs sur les données de test", fontsize=30)
 plt.xlabel("Nombre d'itérations dans l'entraînement", fontsize=30)
 plt.grid(True)
+
+figManager = plt.get_current_fig_manager()
+figManager.window.showMaximized()
 plt.show()
-<<<<<<< HEAD:ocropy/results.py
-=======
+
+plt.savefig('error_plot.png')
 
 index.close()
 data.close()
->>>>>>> b6828cefad94d0d93c516b2c3a1affb4f51cc3d9:results.py

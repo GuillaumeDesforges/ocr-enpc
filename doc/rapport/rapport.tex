@@ -90,7 +90,7 @@
 \appendix
 \newpage 
 
-\section{Introduction}
+\part{Introduction}
 
 L'objectif de ce projet est de tester différentes méthodes de reconnaissance de texte pour des manuscrits anciens écrits en vieux français. Ces manuscrits sont souvent très difficiles à lire, même pour des initiés. Il s'agit donc d'automatiser une tâche déjà dure pour l'homme.
 
@@ -159,7 +159,7 @@ On peut également visualiser les étapes avec la commande: \\
 
 Sur la première ligne se trouve d'abord le numéro de l'itération, puis quelques propriétés de l'image étudiée. L'information se contenant dans le lignes suivantes: \\
 - \texttt{TRU} est la solution recherchée \\
-- \texttt{ALN} est une version allignée de \texttt{TRU} \\
+- \texttt{ALN} est une version alignée de \texttt{TRU} \\
 - \texttt{OUT} est le résultat trouvé par le réseau de neurones \\
 Un réseau de neurones idéal aurait les 3 lignes identiques. \\
 
@@ -172,6 +172,20 @@ On peut ajouter \texttt{-C2} pour une contextualisation des erreurs. \\
 Sur ce premier entraînement sans préparations, on obtient une erreur de l'ordre de 27\% au bout de 12 000 itérations ce qui est extrêmement mauvais. En effet, l'ensemble des caractères sortant de l'ordinaire ne sont pas reconnus.
 
 \subsubsection{Entraînement avec les caractères spéciaux}
+
+Afin d'intégrer les caractères spéciaux à la résolution, la méthode est de les ajouter à la liste des caractères, stockée dans \texttt{char.py}. C'est ce que nous avons fait, mais cela n'a rien changé. Nous avons compris par la suite que nos modifications effectuées étaient correctes, mais qu'il faut relancer la commande d'installation pour les prendre en compte ... \\
+\texttt{sudo python setup.py install} \\
+
+Ceci nous a permis d'obtenir une première courbe d'erreur satisfaisante. Le tracé est réalisé en analysant les modèles sauvegardés toutes les 1000 itérations, et en inscrivant les résultats dans des documents \texttt{.txt}. Un \texit{parsing} avec python permet de récupérer les informations utiles de ceux-ci. 
+Le temps nécessaire pour effectuer 1000 itérations est d'environ 11 minutes sur l'ordinateur que nous avons utilisé pour notre installation \texttt{ocropy}. C'est un portable MSI doté d'une NVIDIA GeForce GTX 1060, le GPU étant le plus important pour entraîner un réseau de neurones.
+
+\begin{figure}[!h] 
+	\center
+	\includegraphics[width=13cm]{error_default.png}
+	\caption{Évolution de l'erreur sur les données comportant des caractères spéciaux.}
+	\label{err_default}
+\end{figure}
+
 % TODO modifier
 \begin{table}[!h]
     \centering
@@ -188,8 +202,7 @@ Sur ce premier entraînement sans préparations, on obtient une erreur de l'ordr
     \label{t1}
 \end{table}
 
-Afin d'intégrer les caractères spéciaux à la résolution, la méthode est de les ajouter à la liste des caractères, stockée dans \texttt{char.py}. C'est ce que nous avons fait, mais cela n'a rien changé. Nous avons compris par la suite que nos modifications effectuées étaient correctes, mais qu'il faut relancer la commande d'installation pour les prendre en compte ... \\
-\texttt{sudo python setup.py install} \\
+
 
 \subsubsection{Premières normalisation}
 
@@ -268,15 +281,18 @@ On distingue 3 types d'erreurs:
 
 \subsubsection{Paramètres utiles}
 
+
+\section{Modification des paramètres d'entraînement}
+
+\subsection{Commandes utiles}
+
 Pour modifier l'apprentissage, on peut ajouter une des lignes suivantes à la fin de la commande pour lancer l'entraînement, afin d'en modifier les propriétés. \\
 \noindent \texttt{--ntrain <Number>} permet de modifier le nombre d'itérations réalisées dans l'entraînement. Plus ce nombre est grand, meilleur sera le résultat du réseau. \\
 \texttt{--savefreq <Number>} permet de dire le nombre d'itérations entre chaque sauvegarde du modèle. Ceci nous permettra dans la suite de tracer les courbes d'erreur. \\
 \texttt{--lrate <Number>} permet de modifier la vitesse d'apprentissage. \\ (\textit{learning rate}). Un de nos premiers objectifs sera de trouver une bonne valeur de ce paramètre. \\
 \texttt{--hiddensize <Number>} permet de modifier un des paramètres de la taille des matrices de notre réseau de neurones. Nous nous intéresserons également à son optimisation. \\
 
-ocropus-rtrain -c train/*/*.gt.txt test/*/*.gt.txt -o test7 train/*/*.bin.png --ntrain 200000 --savefreq 1000
-
-\subsubsection{Commandes bash utiles}
+\subsubsection{Commandes bash utilisées}
 
 \begin{lstlisting}[language=bash]
     ocropus-rpred -m test3-00005000.pyrnn test/*/*.bin.png
@@ -315,3 +331,8 @@ ocropus-rtrain -c train/*/*.gt.txt test/*/*.gt.txt -o test7 train/*/*.bin.png --
 
 \end{document}
 
+\subsection{Modification de la vitesse d'apprentissage}
+
+\subsection{Modification de la taille du réseau}
+
+\end{document}

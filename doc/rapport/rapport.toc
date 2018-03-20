@@ -1,15 +1,17 @@
 \babel@toc {french}{}
-\contentsline {section}{\numberline {A}Introduction}{3}{appendix.A}
-\contentsline {section}{\numberline {B}Base théoriques et état de l'art}{3}{appendix.B}
-\contentsline {section}{\numberline {C}Reconnaissance avec ocropy}{3}{appendix.C}
-\contentsline {subsection}{\numberline {C.1}Présentation}{3}{subsection.C.1}
-\contentsline {subsection}{\numberline {C.2}Entraînement}{3}{subsection.C.2}
-\contentsline {subsection}{\numberline {C.3}Premiers essais}{4}{subsection.C.3}
-\contentsline {subsubsection}{\numberline {C.3.1}Préparation des données}{4}{subsubsection.C.3.1}
-\contentsline {subsubsection}{\numberline {C.3.2}Commandes basiques}{4}{subsubsection.C.3.2}
-\contentsline {subsubsection}{\numberline {C.3.3}Entraînement avec les caractères spéciaux}{5}{subsubsection.C.3.3}
-\contentsline {subsubsection}{\numberline {C.3.4}Premières normalisation}{5}{subsubsection.C.3.4}
-\contentsline {subsubsection}{\numberline {C.3.5}Analyse des premiers modèles normalisés}{5}{subsubsection.C.3.5}
-\contentsline {subsubsection}{\numberline {C.3.6}Amélioration de la normalisation}{7}{subsubsection.C.3.6}
-\contentsline {subsubsection}{\numberline {C.3.7}Paramètres utiles}{7}{subsubsection.C.3.7}
-\contentsline {subsubsection}{\numberline {C.3.8}Commandes bash utiles}{7}{subsubsection.C.3.8}
+\contentsline {part}{I\hspace {1em}Introduction}{3}{part.1}
+\contentsline {section}{\numberline {A}Base th\IeC {\'e}oriques et \IeC {\'e}tat de l'art}{3}{appendix.A}
+\contentsline {section}{\numberline {B}Reconnaissance avec ocropy}{3}{appendix.B}
+\contentsline {subsection}{\numberline {B.1}Pr\IeC {\'e}sentation}{3}{subsection.B.1}
+\contentsline {subsection}{\numberline {B.2}Entra\IeC {\^\i }nement}{3}{subsection.B.2}
+\contentsline {subsection}{\numberline {B.3}Premiers essais}{4}{subsection.B.3}
+\contentsline {subsubsection}{\numberline {B.3.1}Pr\IeC {\'e}paration des donn\IeC {\'e}es}{4}{subsubsection.B.3.1}
+\contentsline {subsubsection}{\numberline {B.3.2}Commandes basiques}{4}{subsubsection.B.3.2}
+\contentsline {subsubsection}{\numberline {B.3.3}Entra\IeC {\^\i }nement avec les caract\IeC {\`e}res sp\IeC {\'e}ciaux}{5}{subsubsection.B.3.3}
+\contentsline {subsubsection}{\numberline {B.3.4}Premi\IeC {\`e}res normalisation}{5}{subsubsection.B.3.4}
+\contentsline {subsubsection}{\numberline {B.3.5}Analyse des premiers mod\IeC {\`e}les normalis\IeC {\'e}s}{6}{subsubsection.B.3.5}
+\contentsline {subsubsection}{\numberline {B.3.6}Am\IeC {\'e}lioration de la normalisation}{8}{subsubsection.B.3.6}
+\contentsline {subsubsection}{\numberline {B.3.7}Param\IeC {\`e}tres utiles}{8}{subsubsection.B.3.7}
+\contentsline {section}{\numberline {C}Modification des param\IeC {\`e}tres d'entra\IeC {\^\i }nement}{8}{appendix.C}
+\contentsline {subsection}{\numberline {C.1}Commandes utiles}{8}{subsection.C.1}
+\contentsline {subsubsection}{\numberline {C.1.1}Commandes bash utilis\IeC {\'e}es}{8}{subsubsection.C.1.1}
