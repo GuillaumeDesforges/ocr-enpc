@@ -7,10 +7,12 @@
 \BOOKMARK [3][-]{subsubsection.B.3.1}{Pr\351paration des donn\351es}{subsection.B.3}% 7
 \BOOKMARK [3][-]{subsubsection.B.3.2}{Commandes basiques}{subsection.B.3}% 8
 \BOOKMARK [3][-]{subsubsection.B.3.3}{Entra\356nement avec les caract\350res sp\351ciaux}{subsection.B.3}% 9
-\BOOKMARK [3][-]{subsubsection.B.3.4}{Premi\350res normalisation}{subsection.B.3}% 10
-\BOOKMARK [3][-]{subsubsection.B.3.5}{Analyse des premiers mod\350les normalis\351s}{subsection.B.3}% 11
-\BOOKMARK [3][-]{subsubsection.B.3.6}{Am\351lioration de la normalisation}{subsection.B.3}% 12
-\BOOKMARK [3][-]{subsubsection.B.3.7}{Param\350tres utiles}{subsection.B.3}% 13
+\BOOKMARK [2][-]{subsection.B.4}{Am\351lioration des mod\350les}{appendix.B}% 10
+\BOOKMARK [3][-]{subsubsection.B.4.1}{Premi\350res normalisation}{subsection.B.4}% 11
+\BOOKMARK [3][-]{subsubsection.B.4.2}{Analyse des premiers mod\350les normalis\351s}{subsection.B.4}% 12
+\BOOKMARK [3][-]{subsubsection.B.4.3}{Am\351lioration de la normalisation}{subsection.B.4}% 13
 \BOOKMARK [1][-]{appendix.C}{Modification des param\350tres d'entra\356nement}{part.1}% 14
 \BOOKMARK [2][-]{subsection.C.1}{Commandes utiles}{appendix.C}% 15
-\BOOKMARK [3][-]{subsubsection.C.1.1}{Commandes bash utilis\351es}{subsection.C.1}% 16
+\BOOKMARK [2][-]{subsection.C.2}{Modification de la learning rate}{appendix.C}% 16
+\BOOKMARK [2][-]{subsection.C.3}{Modification de la taille du r\351seau}{appendix.C}% 17
+\BOOKMARK [1][-]{appendix.D}{Commandes bash utilis\351es}{part.1}% 18

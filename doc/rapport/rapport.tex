@@ -34,7 +34,7 @@
   \normalfont
 }{}
 \newcommand\s{\begin{oldstyle}s\end{oldstyle}}
-    \newcommand\up{\textsuperscript}
+\newcommand\upt{\textsuperscript}
 
 
 \usepackage{fancyhdr}
@@ -171,12 +171,13 @@ On peut ajouter \texttt{-C2} pour une contextualisation des erreurs. \\
 \\
 Sur ce premier entraînement sans préparations, on obtient une erreur de l'ordre de 27\% au bout de 12 000 itérations ce qui est extrêmement mauvais. En effet, l'ensemble des caractères sortant de l'ordinaire ne sont pas reconnus.
 
+
 \subsubsection{Entraînement avec les caractères spéciaux}
 
 Afin d'intégrer les caractères spéciaux à la résolution, la méthode est de les ajouter à la liste des caractères, stockée dans \texttt{char.py}. C'est ce que nous avons fait, mais cela n'a rien changé. Nous avons compris par la suite que nos modifications effectuées étaient correctes, mais qu'il faut relancer la commande d'installation pour les prendre en compte ... \\
 \texttt{sudo python setup.py install} \\
 
-Ceci nous a permis d'obtenir une première courbe d'erreur satisfaisante. Le tracé est réalisé en analysant les modèles sauvegardés toutes les 1000 itérations, et en inscrivant les résultats dans des documents \texttt{.txt}. Un \texit{parsing} avec python permet de récupérer les informations utiles de ceux-ci. 
+Ceci nous a permis d'obtenir une première courbe d'erreur satisfaisante. Le tracé est réalisé en analysant les modèles sauvegardés toutes les 1000 itérations, et en inscrivant les résultats dans des documents \texttt{.txt}. Un \textit{parsing} avec python permet de récupérer les informations utiles de ceux-ci. 
 Le temps nécessaire pour effectuer 1000 itérations est d'environ 11 minutes sur l'ordinateur que nous avons utilisé pour notre installation \texttt{ocropy}. C'est un portable MSI doté d'une NVIDIA GeForce GTX 1060, le GPU étant le plus important pour entraîner un réseau de neurones.
 
 \begin{figure}[!h] 
@@ -186,7 +187,8 @@ Le temps nécessaire pour effectuer 1000 itérations est d'environ 11 minutes su
 	\label{err_default}
 \end{figure}
 
-% TODO modifier
+Le meilleur modèle est obtenu au bout de $50 000$ itérations, et atteint une erreur de $9.811\%$. Ces résultats sont corrects aux vues de la complexité des données, mais nous pensons pouvoir faire mieux avec un peu de pré-traitement et en modifiant certains paramètres.
+
 \begin{table}[!h]
     \centering
     \begin{tabular}{|l|l|lc|l|l|}
@@ -198,11 +200,11 @@ Le temps nécessaire pour effectuer 1000 itérations est d'environ 11 minutes su
         \multicolumn{3}{|l|}{err}       & \multicolumn{3}{c|}{9.275 \%} \\ \hline
         \multicolumn{3}{|l|}{errnomiss} & \multicolumn{3}{c|}{8.289 \%} \\ \hline
     \end{tabular}
-    \caption{Résumé de la commande \texttt{ocropus-errs}}
+    \caption{Output de la commande \texttt{ocropus-errs}}
     \label{t1}
 \end{table}
 
-
+\subsection{Amélioration des modèles}
 
 \subsubsection{Premières normalisation}
 
@@ -211,20 +213,20 @@ On utilise ajoute à la commande d'entraînement la commande suivante : \\
 \texttt{-c train/*/*.gt.txt test/*/*.gt.txt} \\
 Ceci indiquant qu'on va chercher les symboles dans les \textit{ground truth} disponibles.
 Les trois commandes décrites précédemment nous permettent de remarquer qu'au bout de 5000 itérations, l'erreur est descendue à 20\% seulement. La matrice de confusion nous a permis de voir que le caractère \textit{\s} n'était pas reconnu. Ceci étant du à une normalisation de l'unicode effectuée par la l'appel \texttt{-c}. \\
-Pour résoudre ce problème nous avons implémenté un script \texttt{Python} remplaçant les caractères de nos données par leur normalisation \textit{NFC}, et ainsi assurer la symétrie entre les données pouvant être apprises et la solution. Cette normalisation est utilisée par \texttt{ocropy} pour traiter les données lors de l'appel de la fonction \texttt{normalize-text} du module \texttt{common.py}. Cependant, la normalisation du caractère \textit{\s} étant le \textit{s}, déjà présent dans les données, nous l'avons remplacé par un \textit{Z}.
+Pour résoudre ce problème nous avons implémenté un script \texttt{Python} remplaçant les caractères de nos données par leur normalisation \textit{NFC}, et ainsi assurer la symétrie entre les données pouvant être apprises et la solution. Cette normalisation est utilisée par \texttt{ocropy} pour traiter les données lors de l'appel de la fonction \texttt{normalize\_text} du module \texttt{common.py}. Cependant, la normalisation du caractère \textit{\s} étant le \textit{s}, déjà présent dans les données, nous l'avons remplacé par un \textit{Z}.
 
 \subsubsection{Analyse des premiers modèles normalisés}
 
-\texttt{Ocropy} nous permet de sauvegarder nos modèles à un nombre d'itération voulue, pour ce premier test nous les avons sauvegardé tous les 1000 itérations. Ensuite, un script \texttt{bash} utilisant les commandes de validations permet d'évaluer tous les modèles, et d'écrire les output de ces commandes dans un fichier \texttt{.txt}. Nous avons réalisé un script \texttt{Python} afin de réaliser le \textit{post-processing} nécessaire au tracé des courbes d'erreurs.
+La figure \ref{err_norm} montre les améliorations obtenues grâce à ces premières normalisations.
 
 \begin{figure}[!h] 
     \center
-    \includegraphics[width=10cm]{error_normalized.png}
+    \includegraphics[width=10cm]{error_plot_norm.png}
     \caption{Évolution de l'erreur sur les données normalisées.}
     \label{err_norm}
 \end{figure}
 
-La meilleure précision est obtenue pour 83000 itérations, on s'attarde donc un peu plus sur ce modèle particulier pour comprendre les défauts de l'apprentissage. La table \ref{t1} résume les statistiques importantes de ce modèle. \\
+La meilleure précision est obtenue pour 83000 itérations, on s'attarde donc un peu plus sur ce modèle particulier pour comprendre les défauts de l'apprentissage. La table \ref{t2} résume les statistiques importantes de ce modèle. \\
 
 \begin{table}[!h]
     \centering
@@ -238,10 +240,10 @@ La meilleure précision est obtenue pour 83000 itérations, on s'attarde donc un
         \multicolumn{3}{|l|}{errnomiss} & \multicolumn{3}{c|}{8.289 \%} \\ \hline
     \end{tabular}
     \caption{Résumé de la commande \texttt{ocropus-errs}}
-    \label{t1}
+    \label{t2}
 \end{table}
 
-Ce qui nous intéresse plus est contenu dans la table \ref{t2} et explique les défauts du réseau de neuronnes. \\
+Ce qui nous intéresse plus est contenu dans la table \ref{t3} et explique les défauts du réseau de neurones. \\
 On distingue 3 types d'erreurs:
 \begin{enumerate}[parsep=0.1cm,itemsep=0.1cm,topsep=0.1cm]
     \item Les erreurs sur les espaces;
@@ -261,7 +263,7 @@ On distingue 3 types d'erreurs:
         28       &              &     \_      & 2    & a $\delta$ u  & a\_$\delta$ u        \\
         12       & \_           & \'~         & 2    & uı\_t        & uı\'~ t    \\
         10       & \_           &             & 2    & ıez         &  ıe-       \\
-        6        & \_           & \up{a}      & 1    & e u la lt   & e n la\_lt   \\
+        6        & \_           & \upt{a}      & 1    & e u la lt   & e n la\_lt   \\
         4        & u            & n           & 1    & uı\_ b      & u\'{ı} b        \\
         4        & ı            & \_          & 1    & Ztı         & Ztr         \\
         4        & t            & \_          & 1    & aı\_nZ      & a\'{ı}nZ        \\
@@ -270,7 +272,7 @@ On distingue 3 types d'erreurs:
         3        & z            & \_          & 1    & e uZ        & e\_uZ        \\ \hline
     \end{tabular}
     \caption{Résumé de la commande \texttt{ocropus-econf}}
-    \label{t2}
+    \label{t3}
 \end{table}
 
 
@@ -279,7 +281,6 @@ On distingue 3 types d'erreurs:
 % TODO
 
 
-\subsubsection{Paramètres utiles}
 
 
 \section{Modification des paramètres d'entraînement}
@@ -287,12 +288,39 @@ On distingue 3 types d'erreurs:
 \subsection{Commandes utiles}
 
 Pour modifier l'apprentissage, on peut ajouter une des lignes suivantes à la fin de la commande pour lancer l'entraînement, afin d'en modifier les propriétés. \\
-\noindent \texttt{--ntrain <Number>} permet de modifier le nombre d'itérations réalisées dans l'entraînement. Plus ce nombre est grand, meilleur sera le résultat du réseau. \\
-\texttt{--savefreq <Number>} permet de dire le nombre d'itérations entre chaque sauvegarde du modèle. Ceci nous permettra dans la suite de tracer les courbes d'erreur. \\
+\noindent \texttt{--ntrain <Number>} permet de modifier le nombre d'itérations réalisées dans l'entraînement. Plus ce nombre est grand, meilleur sera le résultat du réseau. Par défaut il vaut $10^6$, mais en général nous nous arrêtons vers $10^5$ itérations.\\
+\texttt{--savefreq <Number>} permet de dire le nombre d'itérations entre chaque sauvegarde du modèle. Ceci nous permettra dans la suite de tracer les courbes d'erreur. Le paramètre par défaut est 1000 et est un bon compromis entre la précision des courbes et le temps passé à tester les modèles. \\
 \texttt{--lrate <Number>} permet de modifier la vitesse d'apprentissage. \\ (\textit{learning rate}). Un de nos premiers objectifs sera de trouver une bonne valeur de ce paramètre. \\
 \texttt{--hiddensize <Number>} permet de modifier un des paramètres de la taille des matrices de notre réseau de neurones. Nous nous intéresserons également à son optimisation. \\
 
-\subsubsection{Commandes bash utilisées}
+Dans les sous-sections suivantes, nous travaillons avec les données obtenues avec la première normalisation.
+
+\subsection{Modification de la \textit{learning rate}}
+
+On rappelle que la \textit{learning rate}, vitesse d'apprentissage, ou vitesse d'entraînement, est un hyper-paramètre qui caractérise le pas dans la descente du gradient stochastique présente dans le réseau de neurone. Les courbes figure \ref{err_lrate} comparent les modèles pour la valeur par défaut de la vitesse d'apprentissage, $10^{-3}$, et pour une valeur de $10^{-4}$. 
+
+\begin{figure}[!h] 
+	\center
+	\includegraphics[width=10cm]{error_plot_lrat.png}
+	\caption{Évolution de l'erreur pour deux vitesses d'apprentissage différentes.}
+	\label{err_lrate}
+\end{figure}
+
+On remarque que la courbe au \textit{learning rate} plus faible est plus lente à converger, mais plus régulière. En raison de cette stabilité, le meilleur modèle, obtenu pour 133000 itérations a un taux d'erreur de 9.949\% pour la \textit{learning rate} la plus faible, contre 9.275\% au bout de 83000 itérations dans l'autre cas. C'est pourquoi nous garderons une \textit{learning rate} de $10^{-3}$ dans la suite.
+
+\subsection{Modification de la taille du réseau}
+
+Le paramètre sur lequel on joue ici est le paramètre définissant le nombre de \textit{hidden state}. Ce sont les variables que le \textit{LSTM} utilise pour garder une trace du temps. C'est la partie récurrente du réseau. L'influence de ce paramètre est présentée figure \ref{err_size}.
+
+\begin{figure}[!h] 
+	\center
+	\includegraphics[width=10cm]{error_plot_size.png}
+	\caption{Évolution de l'erreur pour deux tailles de réseau différentes.}
+	\label{err_size}
+\end{figure}
+
+On remarque que les résultats sont meilleurs quand on augmente ce paramètre. La convergence est un peu plus lente en nombre d'itérations, cependant, nous sommes passé de 12 à 18 minutes de temps de calcul nécessaire pour effectuer 1000 itérations. Le meilleur modèle que nous avons obtenu a une erreur de 7.976\%, atteinte pour 95000 itérations, soit plus d'un jour d'entraînement. 
+\section{Commandes bash utilisées}
 
 \begin{lstlisting}[language=bash]
     ocropus-rpred -m test3-00005000.pyrnn test/*/*.bin.png
@@ -326,7 +354,7 @@ Pour modifier l'apprentissage, on peut ajouter une des lignes suivantes à la fi
 \end{lstlisting}
 
 \begin{lstlisting}[language=bash]
-    ocropus-rpred -m test7-00083000.pyrnn test\_n/*/*.bin.png
+    ocropus-rpred -m test8-00050000.pyrnn test/*/*.bin.png
 \end{lstlisting}
 
 \end{document}
