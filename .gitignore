@@ -1,6 +1,13 @@
 # ========= Project ignore =========
 
 data/
+neuralnetworks/MNIST-data/
+
+# latex
+*.out
+*.aux
+*.toc
+*.synctex.gz
 
 # ============ Python ==============
 

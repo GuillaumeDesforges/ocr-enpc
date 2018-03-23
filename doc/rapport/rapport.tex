@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass{report}
 
 \usepackage[utf8]{inputenc}
 \usepackage[french]{babel}
@@ -16,7 +16,21 @@
 \usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{colortbl}
+\usepackage[section]{placeins}
 
+% dimensions
+\usepackage[top=1in, bottom=1.25in, left=1.25in, right=1.25in]{geometry}
+% \setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+
+% chapter
+\usepackage[pagestyles]{titlesec}
+\titleformat{\chapter}[display]{\normalfont\bfseries}{}{0pt}{\Huge}
+\newpagestyle{mystyle}
+{\sethead[\thepage][][\chaptertitle]{}{}{\thepage}}
+\pagestyle{mystyle}
+
+% codes
 \usepackage{listings}
 \lstset{basicstyle=\ttfamily,
   showstringspaces=false,
@@ -24,9 +38,7 @@
   keywordstyle=\color{blue}
 }
 
-%%\usepackage[light]{kpfonts}
-
-
+% old style
 \newenvironment{oldstyle}{%
     \renewcommand\rmdefault{jkplvos}%
   \renewcommand\sfdefault{jkpssvos}%
@@ -36,20 +48,21 @@
 \newcommand\s{\begin{oldstyle}s\end{oldstyle}}
 \newcommand\upt{\textsuperscript}
 
-
+% "fancy" entete de page
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhead[L]{T. \bsc{Viel}, G. \bsc{Desforges}}
 \fancyhead[C]{}
-\fancyhead[R]{OCR dans des Manuscrits}
-\renewcommand{\headrulewidth}{1pt}
+\fancyhead[R]{Reconnaissance de caractères dans des manuscrits}
+%\renewcommand{\headrulewidth}{1pt}
 \fancyfoot[C]{\thepage}
+
 
 %\newcolumntype{C}[1]{>{\centering\arraybackslash }b{#1}}
 %\setcounter{MaxMatrixCols}{20}
 \renewcommand{\footrulewidth}{1pt}
 
-\title{Reconnaissance de Caractères dans des Manuscrits}
+\title{Reconnaissance de caractères dans des manuscrits}
 \date{\today}
 \author{\bsc{Desforges} Guillaume, \bsc{Viel} Théo}
 
@@ -75,7 +88,7 @@
 
     \large{ \bf Projet de Deep Learning}\\
     \vspace{0.2cm}
-    {\Large{\bf Reconnaissance de Caractères dans des Manuscrits}}
+    {\Large{\bf Reconnaissance de caractères dans des manuscrits}}
 
     \vspace{1cm}
 
@@ -86,119 +99,154 @@
 \end{center}
 \newpage
 
+\chapter*{Introduction}
+
+Dans leurs recherches, les historiens et chercheurs en littérature se retrouvent régulièrement confrontés à des parchemins ou des manuscrits dans des langues anciennes.
+Pour améliorer la qualité et la rapidité de leurs recherches, mais aussi pour sauvegarder ce patrimoine, des bases de données de connaissances et de ressources numérisées sont indispensables.
+La digitalisation des écrits est cependant un travaille fastidieux.
+La plupart du temps, seule une copie numérisée des documents est réalisée, alors qu'une réelle digitalisation nécéssiterait de taper manuellement tous les textes dans leur intégralité.
+La masse de travaille évidente qu'un tel processus implique rebute même si les gains seraient conséquents.
+
+C'est ici qu'intervient la montée récente du Deep Learning.
+Depuis quelques années, l'essort qu'ont connu ces techniques d'apprentissage a été justifié par d'incroyables résultats, notamment en vision artificielle.
+La reconnaissance optique de caractères (OCR), réalisé pour la première fois par Gustav Tauschek en 1929 mais qui nécessitait que l'écriture soit très spéciale, a trouvé dans ces nouvelles méthodes un élan nouveau.
+De nombreux outils d'OCR ont vu le jour, cependant ceux-ci requierent souvent des connaissances préalables en machine learning et en informatique.
+
+L'objectif de ce projet est d'étudier la faisabilité \textbf{d'outils pour la digitalisation de documents anciens qui seraient à la portée de tous}.
+
+Nous commencerons d'abord par utiliser des moteurs de reconnaissance existants, à savoir \texttt{ocropy} et \texttt{Tesseract} afin d'avoir des résultats de référence.
+Ensuite nous discuterons de l'implémentation de nos propres systèmes de reconnaissance de caractères.
+Enfin nous présenterons notre solution logicielle, conçue pour être le plus simple pour des utilisateurs voulant des résultats consistants rapidement.
+
+\newpage 
 \tableofcontents
-\appendix
 \newpage 
 
-\part{Introduction}
+\chapter{Moteurs OCR existants}
 
-L'objectif de ce projet est de tester différentes méthodes de reconnaissance de texte pour des manuscrits anciens écrits en vieux français. Ces manuscrits sont souvent très difficiles à lire, même pour des initiés. Il s'agit donc d'automatiser une tâche déjà dure pour l'homme.
+\section{ocropy}
 
-Le problème de reconnaissance de caractères (OCR) est une application classique des réseaux de neurones. C'est donc ce genre de technique que nous explorerons.
+\subsection{Présentation d'ocropy}
 
-Nous commencerons par utiliser des moteurs de reconnaissance existants, à savoir \texttt{ocropy} et \texttt{Tesseract}. La deuxième partie du projet consistera soit à essayer d'améliorer le fonctionnement de l'un d'eux, soit à implémenter notre propre réseau de neurones. 
+\textit{GitHub du projet ocropy} : \href{https://github.com/tmbdev/ocropy}{https://github.com/tmbdev/ocropy}
 
+OCRopus est une collection d'outils pour l'analyse de document, comprenant notamment des scripts d'édition des valeurs de vérité (\textit{ground truth}), d'évaluation de taux d'erreurs et de matrices de confusion, etc.
+\textbf{ocropy} est un projet d'outils de ligne de commande, programmé en Python, permettant de réaliser ces opérations en ligne de commande.
 
-\section{Base théoriques et état de l'art}
+Pour obtenir une version digitale du document, on utilise des \textbf{modèles} de prédiction, déjà existant ou à créer soi-même.
+Pour les manuscrits anciens, il faut la plupart du temps créer son modèle. C'est ce qu'on appelle \textbf{l'entraînement}.
 
-Insert \sout{meme} relevant info here.
+\subsection{Principe et méthodologie}
 
+La méthodologie pour créer un modèle est la suivante :
 
-\section{Reconnaissance avec ocropy}
-
-\subsection{Présentation}
-
-\href{https://github.com/tmbdev/ocropy}{GitHub du projet ocropy}
-
-\begin{quotation}
-    OCRopus is a collection of document analysis programs, not a turn-key OCR system. In order to apply it to your documents, you may need to do some image preprocessing, and possibly also train new models.
-
-    In addition to the recognition scripts themselves, there are a number of scripts for ground truth editing and correction, measuring error rates, determining confusion matrices, etc. OCRopus commands will generally print a stack trace along with an error message; this is not generally indicative of a problem (in a future release, we'll suppress the stack trace by default since it seems to confuse too many users).
-\end{quotation}
-
-\subsection{Entraînement}
-
-Le principe d'entraînement, adapté aux manuscrits, est le suivant : 
-\begin{enumerate}[parsep=0.1cm,itemsep=0.1cm,topsep=0.1cm]
+\begin{enumerate}[parsep=0.1cm,itemsep=0.1cm]
     \item On récupère un ensemble de photos de pages d'un livre ;
-    \item On les binarise, c'est-à-dire que l'on met tous les pixels soit à 1 soit à 0 ;
-    \item On en extrait les lignes ;
-    \item On annote un maximum données ;
-    \item On sélectionne une partie des données annotées pour l'entraînement (90\% des données annotées par exemple), et on garde le reste pour la validation ;
-    \item On entraîne le réseau de neurones sur les données d'entraînement ;
-    \item On valide sur les données de validation en regardant l'erreur.
+    \item On les binarise (c'est-à-dire que l'on met tous les pixels soit à 1 soit à 0) ;
+    \item On extrait les lignes ;
+    \item On annote à la main un maximum de lignes ;
+    \item On sépare les données annotées en deux : une partie des données servira pour la création et l'amélioration du modèle (set de données d'\textbf{entraînement}), et l'autre partie permettra de vérifier si le modèle fonctionne bien (set de données de \textbf{validation}) ;
+    \item On créer le modèle (c'est-à-dire que l'on entraîne le réseau de neurones sur le set de données d'entraînement) ;
+    \item On valide sur le set de données de validation en étudiant le taux d'erreur et les confusions faites par le modèle.
 \end{enumerate}
+
+Le modèle ainsi obtenu permet de faire des \textbf{prédictions}, c'est-à-dire de calculer pour une image donnée la chaîne de caractères qu'il considère la plus probablement écrite.
 
 \subsection{Premiers essais}
 
+Nous avons dans un premier temps téléchargé et installé ocropy.
+Le but fut d'abord de comprendre comment l'utiliser.
+
 \subsubsection{Préparation des données}
 
-Afin de nous familiariser avec cet outil, nous avons commencé par binariser et extraire des lignes d'un manuscrit pris sur le site http://www.e-codices.unifr.ch nous-même. Ce premier test nous a permis de bien comprendre les premiers enjeux. En effet, arrivés à l'étape d'annotation des données, nous avons été confrontés à la difficulté que représente la traduction de ces manuscrits. Le processus est fastidieux puisque les mots mais aussi les caractères ont changé depuis.
+Afin de nous familiariser avec cet outil, nous avons commencé par binariser et extraire des lignes d'un manuscrit pris sur le site http://www.e-codices.unifr.ch nous-même.
+Ce premier test nous a permis de bien comprendre les premiers enjeux.
+En effet, arrivés à l'étape d'annotation des données, nous avons été confrontés à la difficulté que représente la traduction de ces manuscrits.
 
 Par la suite, nous avons abandonné ces données au profit de données annotées nous ayant été mises à disposition par l'ENC.
-
-Nous avons ensuite travaillé sur un manuscrit de la \textit{Chanson d'Otinel} écrit en anglo-normand au XIIIème siècle.
-
+Parmi ces données, nous avons commencé par travailler sur un manuscrit de la \textit{Chanson d'Otinel} écrit en anglo-normand au XIIIème siècle.
 Il est d'une longueur de 46 pages, d'environ 30 lignes chacune. Nous avons pris environ 1300 lignes pour l'entraînement et 100 pour la validation.
 
 \subsubsection{Commandes basiques}
 
-La commande naïve à exécuter pour entraîner un modèle est : \\
-\texttt{ocropus-rtrain -o <ModelName> train/*/*.bin.png} \\
-On peut également visualiser les étapes avec la commande: \\
-\texttt{ocropus-rtrain -o <ModelName> -d 1 train/*/*.bin.png} \\
+La commande naïve à exécuter pour entraîner un modèle est :
+
+\begin{center}
+    \texttt{ocropus-rtrain -o <ModelName> train/*/*.bin.png}
+\end{center}
+
+On peut également visualiser les étapes avec la commande:
+
+\begin{center}
+    \texttt{ocropus-rtrain -o <ModelName> -d 1 train/*/*.bin.png}
+\end{center}
 
 \noindent A chaque itération, on a un output de la forme suivante : 
 
 \begin{figure}[!h] 
     \center
     \includegraphics[width=8cm]{screen_output.png}
-    \caption{Output d'une itération de l'entraînement}
+    \caption{Output d'une itération de l'entraînement} % TODO fix
     \label{API}
 \end{figure}
 
-Sur la première ligne se trouve d'abord le numéro de l'itération, puis quelques propriétés de l'image étudiée. L'information se contenant dans le lignes suivantes: \\
-- \texttt{TRU} est la solution recherchée \\
-- \texttt{ALN} est une version alignée de \texttt{TRU} \\
-- \texttt{OUT} est le résultat trouvé par le réseau de neurones \\
-Un réseau de neurones idéal aurait les 3 lignes identiques. \\
+Sur la première ligne se trouve d'abord le numéro de l'itération, puis quelques propriétés de l'image étudiée. L'information se contenant dans le lignes suivantes:
+\begin{itemize}
+    \item \texttt{TRU} est la solution recherchée
+    \item \texttt{ALN} est une version alignée de \texttt{TRU}
+    \item \texttt{OUT} est le résultat trouvé par le réseau de neurones
+\end{itemize}
 
-Afin de lancer la validation d'un modèle et d'avoir le pourcentage d'erreur, on utilise les commandes suivantes : \\
-- \texttt{ocropus-rpred -m <ModelName> test/*/*.bin.png} \\
-- \texttt{ocropus-errs test/*/*.gt.txt} permet d'évaluer la précision du modèle. \\
-- \texttt{ocropus-econf test/*/*.gt.txt} donne les erreurs les plus fréquentes.
-On peut ajouter \texttt{-C2} pour une contextualisation des erreurs. \\
-\\
+Un réseau de neurones idéal aurait les 3 lignes identiques.
+
+Afin de lancer la validation d'un modèle et d'avoir le pourcentage d'erreur, on utilise les commandes suivantes :
+
+\begin{center}
+    \texttt{ocropus-rpred -m <ModelName> test/*/*.bin.png}
+
+    \texttt{ocropus-errs test/*/*.gt.txt} permet d'évaluer la précision du modèle.
+
+    \texttt{ocropus-econf test/*/*.gt.txt} donne les erreurs les plus fréquentes.
+\end{center}
+
+On peut ajouter \texttt{-C2} pour une contextualisation des erreurs.
+
 Sur ce premier entraînement sans préparations, on obtient une erreur de l'ordre de 27\% au bout de 12 000 itérations ce qui est extrêmement mauvais. En effet, l'ensemble des caractères sortant de l'ordinaire ne sont pas reconnus.
-
 
 \subsubsection{Entraînement avec les caractères spéciaux}
 
-Afin d'intégrer les caractères spéciaux à la résolution, la méthode est de les ajouter à la liste des caractères, stockée dans \texttt{char.py}. C'est ce que nous avons fait, mais cela n'a rien changé. Nous avons compris par la suite que nos modifications effectuées étaient correctes, mais qu'il faut relancer la commande d'installation pour les prendre en compte ... \\
-\texttt{sudo python setup.py install} \\
+Afin d'intégrer les caractères spéciaux à la résolution, la méthode est de les ajouter à la liste des caractères, stockée dans \texttt{char.py}. C'est ce que nous avons fait, mais cela n'a rien changé. Nous avons compris par la suite que nos modifications effectuées étaient correctes, mais qu'il faut relancer la commande d'installation pour les prendre en compte ...
 
-Ceci nous a permis d'obtenir une première courbe d'erreur satisfaisante. Le tracé est réalisé en analysant les modèles sauvegardés toutes les 1000 itérations, et en inscrivant les résultats dans des documents \texttt{.txt}. Un \textit{parsing} avec python permet de récupérer les informations utiles de ceux-ci. 
-Le temps nécessaire pour effectuer 1000 itérations est d'environ 11 minutes sur l'ordinateur que nous avons utilisé pour notre installation \texttt{ocropy}. C'est un portable MSI doté d'une NVIDIA GeForce GTX 1060, le GPU étant le plus important pour entraîner un réseau de neurones.
+\begin{center}
+    \texttt{sudo python setup.py install}
+\end{center}
+
+Ceci nous a permis d'obtenir une première courbe d'erreur satisfaisante.
+Le tracé est réalisé en analysant les modèles sauvegardés toutes les 1000 itérations, et en inscrivant les résultats dans des documents \texttt{.txt}.
+Un \textit{parsing} avec python permet de récupérer les informations utiles de ceux-ci. 
+Le temps nécessaire pour effectuer 1000 itérations est d'environ 11 minutes sur l'ordinateur que nous avons utilisé pour notre installation \texttt{ocropy}.
+C'est un portable MSI doté d'une NVIDIA GeForce GTX 1060, le GPU étant le plus important pour entraîner un réseau de neurones.
 
 \begin{figure}[!h] 
-	\center
-	\includegraphics[width=13cm]{error_default.png}
-	\caption{Évolution de l'erreur sur les données comportant des caractères spéciaux.}
-	\label{err_default}
+    \center
+    \includegraphics[width=13cm]{error_default.png}
+    \caption{Évolution de l'erreur sur les données comportant des caractères spéciaux.}
+    \label{err_default}
 \end{figure}
 
-Le meilleur modèle est obtenu au bout de $50 000$ itérations, et atteint une erreur de $9.811\%$. Ces résultats sont corrects aux vues de la complexité des données, mais nous pensons pouvoir faire mieux avec un peu de pré-traitement et en modifiant certains paramètres.
+Le meilleur modèle est obtenu au bout de $50 000$ itérations, et atteint une erreur de $9.811\%$.
+Ces résultats sont corrects aux vues de la complexité des données, mais nous pensons pouvoir faire mieux avec un peu de pré-traitement et en modifiant certains paramètres.
 
 \begin{table}[!h]
     \centering
     \begin{tabular}{|l|l|lc|l|l|}
         \hline
-        \multicolumn{6}{|c|}{\cellcolor[gray]{0.8}Statistics of the model}                   \\ \hline
-        \multicolumn{3}{|l|}{errors}    & \multicolumn{3}{c|}{329}      \\ \hline
-        \multicolumn{3}{|l|}{missing}   & \multicolumn{3}{c|}{35}       \\ \hline
-        \multicolumn{3}{|l|}{total}     & \multicolumn{3}{c|}{3547}     \\ \hline
-        \multicolumn{3}{|l|}{err}       & \multicolumn{3}{c|}{9.275 \%} \\ \hline
-        \multicolumn{3}{|l|}{errnomiss} & \multicolumn{3}{c|}{8.289 \%} \\ \hline
+        \multicolumn{6}{|c|}{\cellcolor[gray]{0.8}Statistics of the model} \\ \hline
+        \multicolumn{3}{|l|}{errors}    & \multicolumn{3}{c|}{329}         \\ \hline
+        \multicolumn{3}{|l|}{missing}   & \multicolumn{3}{c|}{35}          \\ \hline
+        \multicolumn{3}{|l|}{total}     & \multicolumn{3}{c|}{3547}        \\ \hline
+        \multicolumn{3}{|l|}{err}       & \multicolumn{3}{c|}{9.275 \%}    \\ \hline
+        \multicolumn{3}{|l|}{errnomiss} & \multicolumn{3}{c|}{8.289 \%}    \\ \hline
     \end{tabular}
     \caption{Output de la commande \texttt{ocropus-errs}}
     \label{t1}
@@ -209,11 +257,19 @@ Le meilleur modèle est obtenu au bout de $50 000$ itérations, et atteint une e
 \subsubsection{Premières normalisation}
 
 Nous avons donc opté pour une nouvelle méthode, consistant à repérer manuellement les caractères utilisés avec les fichiers textes contenant l'information de référence.
-On utilise ajoute à la commande d'entraînement la commande suivante : \\
-\texttt{-c train/*/*.gt.txt test/*/*.gt.txt} \\
+On utilise ajoute à la commande d'entraînement la commande suivante :
+
+\begin{center}
+    \texttt{-c train/*/*.gt.txt test/*/*.gt.txt}
+\end{center}
+
 Ceci indiquant qu'on va chercher les symboles dans les \textit{ground truth} disponibles.
-Les trois commandes décrites précédemment nous permettent de remarquer qu'au bout de 5000 itérations, l'erreur est descendue à 20\% seulement. La matrice de confusion nous a permis de voir que le caractère \textit{\s} n'était pas reconnu. Ceci étant du à une normalisation de l'unicode effectuée par la l'appel \texttt{-c}. \\
-Pour résoudre ce problème nous avons implémenté un script \texttt{Python} remplaçant les caractères de nos données par leur normalisation \textit{NFC}, et ainsi assurer la symétrie entre les données pouvant être apprises et la solution. Cette normalisation est utilisée par \texttt{ocropy} pour traiter les données lors de l'appel de la fonction \texttt{normalize\_text} du module \texttt{common.py}. Cependant, la normalisation du caractère \textit{\s} étant le \textit{s}, déjà présent dans les données, nous l'avons remplacé par un \textit{Z}.
+Les trois commandes décrites précédemment nous permettent de remarquer qu'au bout de 5000 itérations, l'erreur est descendue à 20\% seulement.
+La matrice de confusion nous a permis de voir que le caractère \textit{\s} n'était pas reconnu.
+Ceci étant du à une normalisation de l'unicode effectuée par la l'appel \texttt{-c}.
+Pour résoudre ce problème nous avons implémenté un script \texttt{Python} remplaçant les caractères de nos données par leur normalisation \textit{NFC}, et ainsi assurer la symétrie entre les données pouvant être apprises et la solution.
+Cette normalisation est utilisée par \texttt{ocropy} pour traiter les données lors de l'appel de la fonction \texttt{normalize\_text} du module \texttt{common.py}.
+Cependant, la normalisation du caractère \textit{\s} étant le \textit{s}, déjà présent dans les données, nous l'avons remplacé par un \textit{Z}.
 
 \subsubsection{Analyse des premiers modèles normalisés}
 
@@ -226,32 +282,35 @@ La figure \ref{err_norm} montre les améliorations obtenues grâce à ces premi�
     \label{err_norm}
 \end{figure}
 
-La meilleure précision est obtenue pour 83000 itérations, on s'attarde donc un peu plus sur ce modèle particulier pour comprendre les défauts de l'apprentissage. La table \ref{t2} résume les statistiques importantes de ce modèle. \\
+La meilleure précision est obtenue pour 83000 itérations, on s'attarde donc un peu plus sur ce modèle particulier pour comprendre les défauts de l'apprentissage.
+La table \ref{t2} résume les statistiques importantes de ce modèle.
 
 \begin{table}[!h]
     \centering
     \begin{tabular}{|l|l|lc|l|l|}
         \hline
-        \multicolumn{6}{|c|}{\cellcolor[gray]{0.8}Statistics of the model}                   \\ \hline
-        \multicolumn{3}{|l|}{errors}    & \multicolumn{3}{c|}{329}      \\ \hline
-        \multicolumn{3}{|l|}{missing}   & \multicolumn{3}{c|}{35}       \\ \hline
-        \multicolumn{3}{|l|}{total}     & \multicolumn{3}{c|}{3547}     \\ \hline
-        \multicolumn{3}{|l|}{err}       & \multicolumn{3}{c|}{9.275 \%} \\ \hline
-        \multicolumn{3}{|l|}{errnomiss} & \multicolumn{3}{c|}{8.289 \%} \\ \hline
+        \multicolumn{6}{|c|}{\cellcolor[gray]{0.8}Statistics of the model} \\ \hline
+        \multicolumn{3}{|l|}{errors}    & \multicolumn{3}{c|}{329}         \\ \hline
+        \multicolumn{3}{|l|}{missing}   & \multicolumn{3}{c|}{35}          \\ \hline
+        \multicolumn{3}{|l|}{total}     & \multicolumn{3}{c|}{3547}        \\ \hline
+        \multicolumn{3}{|l|}{err}       & \multicolumn{3}{c|}{9.275 \%}    \\ \hline
+        \multicolumn{3}{|l|}{errnomiss} & \multicolumn{3}{c|}{8.289 \%}    \\ \hline
     \end{tabular}
     \caption{Résumé de la commande \texttt{ocropus-errs}}
     \label{t2}
 \end{table}
 
-Ce qui nous intéresse plus est contenu dans la table \ref{t3} et explique les défauts du réseau de neurones. \\
+Ce qui nous intéresse plus est contenu dans la table \ref{t3} et explique les défauts du réseau de neurones.
 On distingue 3 types d'erreurs:
+
 \begin{enumerate}[parsep=0.1cm,itemsep=0.1cm,topsep=0.1cm]
     \item Les erreurs sur les espaces;
     \item Les erreurs sur les caractères superscripts;
     \item Les erreurs sur les lettres semblables. 
 \end{enumerate}
 
-\noindent Le premier peut sans doute être éliminé avec un peu de traitement des données, le second également mais causerait sans doute de la perte de sens. Le troisième est plus caractéristique de l'écriture puisque les lettres \textit{u, n, m, i et l} se ressemblent souvent.
+\noindent Le premier peut sans doute être éliminé avec un peu de traitement des données, le second également mais causerait sans doute de la perte de sens.
+Le troisième est plus caractéristique de l'écriture puisque les lettres \textit{u, n, m, i et l} se ressemblent souvent.
 
 \begin{table}[!h]
     \centering
@@ -265,7 +324,7 @@ On distingue 3 types d'erreurs:
         10       & \_           &             & 2    & ıez         &  ıe-       \\
         6        & \_           & \upt{a}      & 1    & e u la lt   & e n la\_lt   \\
         4        & u            & n           & 1    & uı\_ b      & u\'{ı} b        \\
-        4        & ı            & \_          & 1    & Ztı         & Ztr         \\
+zsh:1: command not found: q
         4        & t            & \_          & 1    & aı\_nZ      & a\'{ı}nZ        \\
         4        & ı            &  r          & 1    & eg ler      & egı\_er      \\
         3        & ı            & u           & 1    & O\_gı       & O gı         \\
@@ -280,47 +339,65 @@ On distingue 3 types d'erreurs:
 
 % TODO
 
+\subsection{Modification des paramètres d'entraînement}
 
+\subsubsection{Commandes utiles}
 
+Pour modifier l'apprentissage, on peut ajouter une des lignes suivantes à la fin de la commande pour lancer l'entraînement, afin d'en modifier les propriétés.
 
-\section{Modification des paramètres d'entraînement}
+\texttt{--ntrain <Number>} permet de modifier le nombre d'itérations réalisées dans l'entraînement.
+Plus ce nombre est grand, meilleur sera le résultat du réseau.
+Par défaut il vaut $10^6$, mais en général nous nous arrêtons vers $10^5$ itérations.
 
-\subsection{Commandes utiles}
+\texttt{--savefreq <Number>} permet de dire le nombre d'itérations entre chaque sauvegarde du modèle.
+Ceci nous permettra dans la suite de tracer les courbes d'erreur.
+Le paramètre par défaut est 1000 et est un bon compromis entre la précision des courbes et le temps passé à tester les modèles.
 
-Pour modifier l'apprentissage, on peut ajouter une des lignes suivantes à la fin de la commande pour lancer l'entraînement, afin d'en modifier les propriétés. \\
-\noindent \texttt{--ntrain <Number>} permet de modifier le nombre d'itérations réalisées dans l'entraînement. Plus ce nombre est grand, meilleur sera le résultat du réseau. Par défaut il vaut $10^6$, mais en général nous nous arrêtons vers $10^5$ itérations.\\
-\texttt{--savefreq <Number>} permet de dire le nombre d'itérations entre chaque sauvegarde du modèle. Ceci nous permettra dans la suite de tracer les courbes d'erreur. Le paramètre par défaut est 1000 et est un bon compromis entre la précision des courbes et le temps passé à tester les modèles. \\
-\texttt{--lrate <Number>} permet de modifier la vitesse d'apprentissage. \\ (\textit{learning rate}). Un de nos premiers objectifs sera de trouver une bonne valeur de ce paramètre. \\
-\texttt{--hiddensize <Number>} permet de modifier un des paramètres de la taille des matrices de notre réseau de neurones. Nous nous intéresserons également à son optimisation. \\
+\texttt{--lrate <Number>} permet de modifier la vitesse d'apprentissage (\textit{learning rate}).
+Un de nos premiers objectifs sera de trouver une bonne valeur de ce paramètre.
+
+\texttt{--hiddensize <Number>} permet de modifier un des paramètres de la taille des matrices de notre réseau de neurones.
+Nous nous intéresserons également à son optimisation.
 
 Dans les sous-sections suivantes, nous travaillons avec les données obtenues avec la première normalisation.
 
-\subsection{Modification de la \textit{learning rate}}
+\subsubsection{Modification de la \textit{learning rate}}
 
-On rappelle que la \textit{learning rate}, vitesse d'apprentissage, ou vitesse d'entraînement, est un hyper-paramètre qui caractérise le pas dans la descente du gradient stochastique présente dans le réseau de neurone. Les courbes figure \ref{err_lrate} comparent les modèles pour la valeur par défaut de la vitesse d'apprentissage, $10^{-3}$, et pour une valeur de $10^{-4}$. 
-
-\begin{figure}[!h] 
-	\center
-	\includegraphics[width=10cm]{error_plot_lrat.png}
-	\caption{Évolution de l'erreur pour deux vitesses d'apprentissage différentes.}
-	\label{err_lrate}
-\end{figure}
-
-On remarque que la courbe au \textit{learning rate} plus faible est plus lente à converger, mais plus régulière. En raison de cette stabilité, le meilleur modèle, obtenu pour 133000 itérations a un taux d'erreur de 9.949\% pour la \textit{learning rate} la plus faible, contre 9.275\% au bout de 83000 itérations dans l'autre cas. C'est pourquoi nous garderons une \textit{learning rate} de $10^{-3}$ dans la suite.
-
-\subsection{Modification de la taille du réseau}
-
-Le paramètre sur lequel on joue ici est le paramètre définissant le nombre de \textit{hidden state}. Ce sont les variables que le \textit{LSTM} utilise pour garder une trace du temps. C'est la partie récurrente du réseau. L'influence de ce paramètre est présentée figure \ref{err_size}.
+On rappelle que la \textit{learning rate}, vitesse d'apprentissage, ou vitesse d'entraînement, est un hyper-paramètre qui caractérise le pas dans la descente du gradient stochastique présente dans le réseau de neurone.
+Les courbes figure \ref{err_lrate} comparent les modèles pour la valeur par défaut de la vitesse d'apprentissage, $10^{-3}$, et pour une valeur de $10^{-4}$. 
 
 \begin{figure}[!h] 
-	\center
-	\includegraphics[width=10cm]{error_plot_size.png}
-	\caption{Évolution de l'erreur pour deux tailles de réseau différentes.}
-	\label{err_size}
+    \center
+    \includegraphics[width=10cm]{error_plot_lrat.png}
+    \caption{Évolution de l'erreur pour deux vitesses d'apprentissage différentes.}
+    \label{err_lrate}
 \end{figure}
 
-On remarque que les résultats sont meilleurs quand on augmente ce paramètre. La convergence est un peu plus lente en nombre d'itérations, cependant, nous sommes passé de 12 à 18 minutes de temps de calcul nécessaire pour effectuer 1000 itérations. Le meilleur modèle que nous avons obtenu a une erreur de 7.976\%, atteinte pour 95000 itérations, soit plus d'un jour d'entraînement. 
-\section{Commandes bash utilisées}
+On remarque que la courbe au \textit{learning rate} plus faible est plus lente à converger, mais plus régulière.
+En raison de cette stabilité, le meilleur modèle, obtenu pour 133000 itérations a un taux d'erreur de 9.949\% pour la \textit{learning rate} la plus faible, contre 9.275\% au bout de 83000 itérations dans l'autre cas.
+C'est pourquoi nous garderons une \textit{learning rate} de $10^{-3}$ dans la suite.
+
+\subsubsection{Modification de la taille du réseau}
+
+Le paramètre sur lequel on joue ici est le paramètre définissant le nombre de \textit{hidden state}.
+Ce sont les variables que le \textit{LSTM} utilise pour garder une trace du temps.
+C'est la partie récurrente du réseau.
+L'influence de ce paramètre est présentée figure \ref{err_size}.
+
+\begin{figure}[!h] 
+    \center
+    \includegraphics[width=10cm]{error_plot_size.png}
+    \caption{Évolution de l'erreur pour deux tailles de réseau différentes.}
+    \label{err_size}
+\end{figure}
+
+On remarque que les résultats sont meilleurs quand on augmente ce paramètre.
+La convergence est un peu plus lente en nombre d'itérations, cependant, nous sommes passé de 12 à 18 minutes de temps de calcul nécessaire pour effectuer 1000 itérations.
+Le meilleur modèle que nous avons obtenu a une erreur de 7.976\%, atteinte pour 95000 itérations, soit plus d'un jour d'entraînement. 
+
+\FloatBarrier
+
+\subsection{Commandes bash utilisées}
 
 \begin{lstlisting}[language=bash]
     ocropus-rpred -m test3-00005000.pyrnn test/*/*.bin.png
@@ -357,10 +434,49 @@ On remarque que les résultats sont meilleurs quand on augmente ce paramètre. L
     ocropus-rpred -m test8-00050000.pyrnn test/*/*.bin.png
 \end{lstlisting}
 
-\end{document}
+\subsubsection{Modification de la vitesse d'apprentissage}
 
-\subsection{Modification de la vitesse d'apprentissage}
+% TODO
 
-\subsection{Modification de la taille du réseau}
+\subsubsection{Modification de la taille du réseau}
 
+% TODO
+
+\newpage
+
+\section{Tesseract}
+
+\subsection{Présentation de Tesseract}
+
+\textbf{Tesseract} est un outil d'OCR, développé par HP en 1985.
+Il est depuis devenu Open Source, et est maintenu par Google depuis 2006.
+Il est souvent considéré comme l'un des meilleurs moteur d'OCR.
+
+\subsubsection{Utilisation de Tesseract}
+
+Tesseract s'utilise comme ocropy en ligne de commande.
+L'utilisation la plus simple est pour lire le texte d'une image dans une langue pour un modèle existant.
+
+\texttt{tesseract imagename|stdin outputbase|stdout}
+
+Google ayant entrainé des modèles dans plus de 50 langues sur des millions de caractères pour des milliers de polices différentes, les résultats sont incroyables.
+
+\subsubsection{Entrainement de Tesseract}
+
+C'est en voulant entrainer Tesseract que nous avons constaté de nombreux défauts.
+
+Dans sa récente version incluant les réseaux LSTM, créer des modèles relève du défi aussi bien technique que psychologique.
+La documentation à ce propos est inintelligible pour les personnes n'étant pas initiée aussi bien dans la vision artificielle qu'à l'utilisation avancée des versions précédentes de Tesseract, mais elle est en plus incomplète et indigeste.
+Une des raisons à cela serait probablement que l'outil est encore en version alpha, mais aussi que la plupart des personnes autour du projet considèrent que le code en lui-même constitue un élément suffisant pour pouvoir savoir entrainer des modèles soi-même.
+
+Tesseract est donc un puissant outil pour la reconnaissance de caractères dans des langues ayant déjà été entrainées, mais dans le cadre de notre problème il ne semble pas adapté.
+En effet, il nous faudrait un outil adaptable à de nombreuses langues et écritures.
+
+\chapter{Création d'une solution OCR}
+
+\section{Principe du réseau de neurone appliqué à l'OCR}
+
+Parce que c'est BUENO
+
+\appendix
 \end{document}
