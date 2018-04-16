@@ -1,6 +1,6 @@
 # ========= Project ignore =========
 
-data/
+# data/
 neuralnetworks/MNIST-data/
 
 # latex
