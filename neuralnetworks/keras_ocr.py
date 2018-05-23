@@ -35,10 +35,33 @@ parser.add_argument(
         help='path to dataset folder with images and labels')
 
 parser.add_argument(
+        '--validation',
+        type=str,
+        help='path to validation dataset folder with images and labels for train mode only')
+
+parser.add_argument(
         '-e', '--epochs',
         type=int,
         default=1,
         help='number of epochs to train on')
+
+parser.add_argument(
+        '-r', '--learningrate',
+        type=float,
+        default=0.01,
+        help='learning rate')
+
+parser.add_argument(
+        '--imageheight',
+        type=int,
+        default=150,
+        help='processed image height')
+
+parser.add_argument(
+        '--cellsize',
+        type=int,
+        default=100,
+        help='rnn cell size')
 
 parser.add_argument(
         '-v', '--verbose',
@@ -58,9 +81,26 @@ model_path = os.path.abspath(cmd_args.model_path)
 # read dataset path
 dataset_path = os.path.abspath(cmd_args.dataset_path)
 
+# read validation dataset path
+if cmd_args.validation:
+    validation = True
+    validation_dataset_path = os.path.abspath(cmd_args.validation)
+else:
+    validation = False
+
 # number of epochs
 if mode == 'train':
     n_epochs = cmd_args.epochs
+
+# learning rate
+if mode == 'train':
+    learning_rate = cmd_args.learningrate
+
+# image height
+img_height = cmd_args.imageheight
+
+# rnn cell size
+rnn_cell_size = cmd_args.cellsize
 
 # read verbosity level
 verbose = cmd_args.verbose
@@ -79,40 +119,57 @@ from keras.optimizers import SGD
 # TAGS (file paths)
 
 # load folder data by walking dataset path
-tags_img = []
-tags_txt = []
-for root, dirs, files in os.walk(dataset_path, topdown=False):
-    root = os.path.abspath(root)
-    for name in files:
-        file_path = os.path.join(root, name)
-        # store png and txt file path to corresponding storage, without file extension
-        if file_path.endswith('.png'):
-            tags_img.append(file_path.strip('.png'))
-            if verbose >= VERBOSE_HIGH:
-                print(file_path)
-        if name.endswith('.txt'):
-            tags_txt.append(file_path.strip('.txt'))
-            if verbose >= VERBOSE_HIGH:
-                print(file_path)
+def load_tags(dataset_path):
+    tags_img = []
+    tags_txt = []
+    for root, dirs, files in os.walk(dataset_path, topdown=False):
+        root = os.path.abspath(root)
+        for name in files:
+            file_path = os.path.join(root, name)
+            # store png and txt file path to corresponding storage, without file extension
+            if file_path.endswith('.png'):
+                tags_img.append(file_path.strip('.png'))
+                if verbose >= VERBOSE_HIGH:
+                    print(file_path)
+            if name.endswith('.txt'):
+                tags_txt.append(file_path.strip('.txt'))
+                if verbose >= VERBOSE_HIGH:
+                    print(file_path)
 
-# merge tags where there is both img and txt
-tags = [tag for tag in tags_img if tag in tags_txt]
+    # merge tags where there is both img and txt
+    tags = [tag for tag in tags_img if tag in tags_txt]
+    if verbose:
+        print("Found {} samples to load".format(len(tags)))
+
+    return tags
+
 if verbose:
-    print("Found {} samples to load".format(len(tags)))
+    print("Listing dataset samples")
+tags = load_tags(dataset_path)
 
+if validation:
+    if verbose:
+        print("Listing validation dataset samples")
+    validation_tags = load_tags(validation_dataset_path)
 
 # TEXT LABELS
 
-# read dataset text labels from files
-Y_text = []
-for i, tag in enumerate(tags):
-    with open(tag+'.txt', 'r') as f:
-        y_text = f.readline().rstrip()
-        Y_text.append(y_text)
+def load_labels(tags):
+    # read dataset text labels from files
+    Y_text = []
+    for i, tag in enumerate(tags):
+        with open(tag+'.txt', 'r') as f:
+            y_text = f.readline().rstrip()
+            Y_text.append(y_text)
 
-# keep only data with non empty label
-tags, Y_text = map(list, zip(*filter(lambda x: x[1] != '', zip(tags, Y_text))))
+    # keep only data with non empty label
+    tags, Y_text = map(list, zip(*filter(lambda x: x[1] != '', zip(tags, Y_text))))
 
+    return tags, Y_text
+
+tags, Y_text = load_labels(tags)
+if validation:
+    validation_tags, validation_Y_text = load_labels(validation_tags)
 
 # ALPHABET
 
@@ -165,71 +222,87 @@ else:
 # CODED LABELS
 
 # transform text label into code label
-Y = [[alphabet.find(c) for c in y_text] for y_text in Y_text]
+def encode_labels(Y_text):
+    return [[alphabet.find(c) for c in y_text] for y_text in Y_text]
+
+Y = encode_labels(Y_text)
 if verbose:
     print("Transformed text label to encoded label")
-
+if validation:
+    validation_Y = encode_labels(validation_Y_text)
 
 # IMAGES
 
-# load images
-imgs = [imread(tag+'.png') for tag in tags]
-if verbose:
-    print("Images read")
-
 # change all images height as to fit fixed size
-img_height = 150
+def load_inputs(tags):
+    # load images
+    imgs = [imread(tag+'.png') for tag in tags]
+    X = []
+    for i, (tag, img) in enumerate(zip(tags, imgs)):
+        # grayscale
+        x = img[:, :, :-2].mean(axis=2) if len(img.shape) > 2 else img
+        # current image shape
+        img_height_in, img_width_in = x.shape
+        # expected image shape
+        img_width_out = int(img_width_in * (img_height/img_height_in))
+        # open cv is (width, height)
+        x = x.transpose()
+        # resize
+        x_resized = cv2.resize(x, dsize=(img_height, img_width_out), interpolation=cv2.INTER_LINEAR)
+        # flip back to (height, width)
+        x_resized = x_resized.transpose()
+        # store result
+        X.append(x_resized)
 
-X = []
-for i, (tag, img) in enumerate(zip(tags, imgs)):
-    # grayscale
-    x = img[:, :, :-2].mean(axis=2) if len(img.shape) > 2 else img
-    # current image shape
-    img_height_in, img_width_in = x.shape
-    # expected image shape
-    img_width_out = int(img_width_in * (img_height/img_height_in))
-    # open cv is (width, height)
-    x = x.transpose()
-    # resize
-    x_resized = cv2.resize(x, dsize=(img_height, img_width_out), interpolation=cv2.INTER_LINEAR)
-    # flip back to (height, width)
-    x_resized = x_resized.transpose()
-    # store result
-    X.append(x_resized)
+    return imgs, X
 
-
-# WIDTHS
-
-# image widths
-X_widths = [x.shape[1] for x in X]
-X_widths_max = max(X_widths)
-
-# label widths
-Y_lens = [len(y_text) for y_text in Y_text]
-Y_lens_max = max(Y_lens)
-
+imgs, X = load_inputs(tags)
+if validation:
+    validation_imgs, validation_X = load_inputs(validation_tags)
 
 # NUMPY & KERAS DATA FORMATING
 
-# stack images
-X = np.array([np.hstack([x, np.ones((img_height, X_widths_max-width))]) for x, width in zip(X, X_widths)])
-# images are 
+def format_data(X, Y, X_widths_max=None, Y_widths_max=None):
+    # image widths
+    X_widths = [x.shape[1] for x in X]
+    if X_widths_max is None:
+        X_widths_max = max(X_widths)
+    
+    # label widths
+    Y_widths = [len(y) for y in Y]
+    if Y_widths_max is None:
+        Y_widths_max = max(Y_widths)
+
+    # stack images
+    X = np.array([np.hstack([x, np.ones((img_height, X_widths_max-width))]) for x, width in zip(X, X_widths)])
+    # images are channel first or last
+    if K.image_data_format() == 'channels_first':
+        X = np.swapaxes(X[:, :, :, np.newaxis], 1, 3)
+    else:
+        X = np.swapaxes(X, 1, 2)[:, :, :, np.newaxis]
+    
+    # image widths array
+    X_widths = np.array(X_widths)
+    
+    # labels array
+    Y = np.array([np.hstack([y, len(alphabet)*np.ones((Y_widths_max-l))]) for y, l in zip(Y, Y_widths)], dtype=np.int)
+    
+    # label widths
+    Y_widths = np.array(Y_widths)
+
+    return X, X_widths, X_widths_max, Y, Y_widths, Y_widths_max
+
+X, X_widths, X_widths_max, Y, Y_widths, Y_widths_max = format_data(X, Y)
+if validation:
+    validation_X, validation_X_widths, validation_X_widths_max, validation_Y, validation_Y_widths, validation_Y_widths_max = format_data(validation_X, validation_Y, X_widths_max=X_widths_max, Y_widths_max=Y_widths_max)
+
 if K.image_data_format() == 'channels_first':
-    X = np.swapaxes(X[:, :, :, np.newaxis], 1, 3)
     input_shape = (1, X_widths_max, img_height)
 else:
-    X = np.swapaxes(X, 1, 2)[:, :, :, np.newaxis]
     input_shape = (X_widths_max, img_height, 1)
 
-# image widths array
-X_widths = np.array(X_widths)
-
-# labels array
-Y = np.array([np.hstack([y, len(alphabet)*np.ones((Y_lens_max-l))]) for y, l in zip(Y, Y_lens)], dtype=np.int)
-
-# label widths
-Y_lens = np.array(Y_lens)
-
+if verbose:
+    print("Formated input data")
 
 # MODEL
 
@@ -238,7 +311,7 @@ inputs = Input(name='inputs', shape=input_shape, dtype='float32')
 inputs_width = Input(name='inputs_width', shape=[1], dtype='int64')
 
 # labels
-labels = Input(name='labels', shape=[Y_lens_max], dtype='float32')
+labels = Input(name='labels', shape=[Y_widths_max], dtype='float32')
 labels_length = Input(name='labels_length', shape=[1], dtype='int64')
 
 # cnn
@@ -248,13 +321,13 @@ labels_length = Input(name='labels_length', shape=[1], dtype='int64')
 # maxpool1 = MaxPooling2D(2, name='maxpool1')(conv3)
 
 #rnn
-n_features = img_height
+n_features = img_height*1
 rnn_inputs = inputs
 reshape1 = Reshape((-1, n_features), name='reshape1')(rnn_inputs)
-lstm1_f = LSTM(100, name='lstm1_f', return_sequences=True, kernel_initializer='he_normal')(reshape1)
-lstm1_b = LSTM(100, name='lstm1_b', return_sequences=True, kernel_initializer='he_normal', go_backwards=True)(reshape1)
-lstm1 = Concatenate(name='lstm1')([lstm1_f, lstm1_b])
-rnn_out = lstm1
+lstm1_f = LSTM(rnn_cell_size, name='lstm1_f', return_sequences=True, kernel_initializer='he_normal')(reshape1)
+# lstm1_b = LSTM(rnn_cell_size, name='lstm1_b', return_sequences=True, kernel_initializer='he_normal', go_backwards=True)(reshape1)
+# lstm1 = Concatenate(name='lstm1')([lstm1_f, lstm1_b])
+rnn_out = lstm1_f
 
 # char activation
 dense1 = Dense(len(alphabet)+1, name='dense1')(rnn_out)
@@ -269,13 +342,13 @@ def ctc_lambda_func(args):
     return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
 
 # wrapped ctc loss in lambda layer
-ctc1 = Lambda(ctc_lambda_func, output_shape=(1,), name='ctc1')([softmax1, labels, inputs_width, labels_length])
+ctc1 = Lambda(ctc_lambda_func, output_shape=(1,), name='ctc1')([dense1, labels, inputs_width, labels_length])
 
 # model
 if mode == 'train':
     model = Model(inputs=[inputs, labels, inputs_width, labels_length], outputs=ctc1)
     # note : clipnorm seems to speeds up convergence
-    sgd = SGD(lr=0.02, decay=1e-6, momentum=0.9, nesterov=True, clipnorm=5)
+    sgd = SGD(lr=learning_rate, decay=1e-6, momentum=0.9, nesterov=True, clipnorm=5)
     # the loss calc occurs elsewhere, so use a dummy lambda func for the loss
     model.compile(
         loss={'ctc1': lambda y_true, y_pred: y_pred},
@@ -301,32 +374,60 @@ else:
         print("A trained model is needed for mode {}".format(mode))
         sys.exit(1)
 
+# find current epoch number
+model_epoch_path = os.path.join(model_path, 'epoch.txt')
+
+if os.path.isfile(model_epoch_path):
+    if verbose >= VERBOSE_HIGH:
+        print("Epoch file found")
+    with open(model_epoch_path, 'r') as f:
+        initial_epoch = int(f.readline().rstrip())
+else:
+    initial_epoch = 0
+
 
 # TRAIN
 
 if mode == 'train':
+    tensorboard_logs = os.path.join(model_path, 'logs')
     callback_tensorboard = keras.callbacks.TensorBoard(
-        #log_dir='./logs',
-        #histogram_freq=0,
-        #write_graph=True,
-        #write_grads=False,
+        log_dir=tensorboard_logs,
+        histogram_freq=1,
+        write_graph=False,
+        write_grads=True,
         write_images=True,
         #embeddings_freq=0,
         #embeddings_layer_names=None,
         #embeddings_metadata=None
     )
-    model.fit(
-        x={
+    train_args = {
+        'x': {
             'inputs': X,
             'inputs_width': X_widths,
             'labels': Y,
-            'labels_length': Y_lens,
+            'labels_length': Y_widths,
         },
-        y=Y,
-        epochs=n_epochs,
-        callbacks=[callback_tensorboard],
-    )
+        'y': Y,
+        'initial_epoch': initial_epoch,
+        'epochs': initial_epoch + n_epochs,
+        'callbacks': [callback_tensorboard],
+        'batch_size': 32,
+    }
+    if validation:
+        train_args['validation_data'] = ({
+            'inputs': validation_X,
+            'inputs_width': validation_X_widths,
+            'labels': validation_Y,
+            'labels_length': validation_Y_widths
+            },
+            validation_Y
+        )
+    model.fit(**train_args)
     print("Training done")
+    with open(model_epoch_path, 'w') as f:
+        f.write(str(initial_epoch+n_epochs))
+    if verbose:
+        print("Saved epoch")
     model.save_weights(model_weights_path)
     if verbose:
         print("Saved weights")
@@ -354,11 +455,22 @@ if mode == 'test':
     # distances
     Y_dist = [Levenshtein.distance(y_text, y_pred_text) for y_text, y_pred_text in zip(Y_text, Y_pred_text)]
     
-    total_dist_diff = sum(Y_dist)
-    total_text_len = sum([len(y_text) for y_text in Y_text])
-    error_rate = total_dist_diff / total_text_len
+    mean_errors = [y_dist/y_width for y_dist, y_width in zip(Y_dist, Y_widths)]
+    total_mean_error = sum(mean_errors)/len(mean_errors)
 
-    print("Test error rate : {:3.0f}%".format(error_rate*100))
+    print("Mean distance : {:.5f}".format(total_mean_error))
+
+    max_mean_error, y_text, y_pred_text = max(zip(mean_errors, Y_text, Y_pred_text), key=lambda x:x[0])
+    print("Worst case :")
+    print("  TRU= " + y_text)
+    print("  PRD= " + y_pred_text)
+    print("  Mean error distance= " + str(max_mean_error))
+
+    min_mean_error, y_text, y_pred_text = min(zip(mean_errors, Y_text, Y_pred_text), key=lambda x:x[0])
+    print("Best case :")
+    print("  TRU= " + y_text)
+    print("  PRD= " + y_pred_text)
+    print("  Mean error distance= " + str(max_mean_error))
 
 # PREDICT
 if mode == 'predict':
