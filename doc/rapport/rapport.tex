@@ -359,7 +359,61 @@ En effet, il nous faudrait un outil adaptable à de nombreuses langues et écrit
 
 \section{Principe du réseau de neurone appliqué à l'OCR}
 
-Parce que c'est BUENO
+Supposons que l'on traite une image $I(x, y)_{x \in [0, W[,\ y \in [0, H[}$.
+Quand on y lit le texte, on balaie l'image de gauche à droite, et on détermine les lettres puis les mots étant donné ce que l'on voit à l'instant combiné à ce que l'on a vu précédemment.
+On peut donc considérer la lecture du texte sur l'image comme un procédé séquentiel, où l'on a une entrée $X_t = \left(I(t, y)\right)_{y\in [0, H[}$.oChaque $X_t$ est donc une colonne de 1 pixel de large et $H$ pixels de haut.
+
+On peut alors utiliser un réseau neuronal récurent (\emph{RNN}).
+Le principe d'une couche de neurone récurent est de traîter la séquence étape par étape, en gardant en mémoire un \emph{état} $h_t$.
+En combinant l'arrivée de donnée $X_t$ et l'état $h_t$, le RNN va pouvoir capter des patterns dans la séquence et ressortir un output $Y_t$ représentatif des features à cet instant $t$.
+
+En repassant cet output $Y_t$ dans un classifieur, on peut alors déterminer pour chaque colonne de pixel sa probabilité de représenter un caractère.
+
+En pratique, on utilisera la même architecture que le réseau d'ocropy avec :
+
+\begin{itemize}
+	\item les données en entrée
+	\item un RNN
+		\item un LSTM forward
+		\item un LSTM backward
+	\item un merge des deux sorties
+	\item un réseau dense
+	\item un softmax
+\end{itemize}
+
+\section{La CTC loss}
+
+Brièvement, la CTC Loss est une solution technique au problème suivant :
+étant donné qu'une image à traiter peut posséder entre 800 et 2000 colonnes de pixels, comment labeliser l'image ?
+
+Une approche naïve serait de labeliser pour chaque colonne la lettre qu'elle est censé représenter.
+D'une part le problème devient trop contraignant, d'autre part ce type de précision ne nous intéresse pas.
+En effet, si le réseau est capable de détecter une lettre uniquement par son début, uniquement par son milieu, ou uniquement par sa fin, ce fonctionnent complique inutilement le problème d'apprentissage.
+D'autre part, on ne peut comparer naïvement une séquence de 2000 sorties du réseau et un label représentant le texte qui serait ayant une taille aux alentours de 30 ou 40.
+
+La CTC répond à ces problématiques.
+
+\textit{
+Nous avons présentée ses spécificités technique à l'oral.
+Si nécessaire, nous pouvons ré-expliquer ici son fonctionnement.
+}
+
+\section{Développement avec Keras}
+
+Keras est un wrapper pour faire des architectures de Deep Learning, fonctionnant avec TensorFlow, Theano et CNTK.
+Nous avons choisi ce module car sa modularité avec plusieurs \emph{backends} le rend très portable, ce qui est important si l'on veut développer une solution elle-même portable et utilisable par une majorité de personnes.
+
+Des expérimentations sont disponibles dans le dossier \textit{neuralnetworks} du repository du projet.
+
+Nous avons ensuite implémenter une solution d'OCR. Le github est publique :
+
+https://github.com/GuillaumeDesforges/simple-ocr
+
+Une des difficulté a été d'utiliser les fonctions relative à la CTC (la loss et le décodage).
+Leur utilisation n'est en effet pas direct comme les autres fonctions et couches, et elles sont peu documentées.
+Une compréhension des calculs réalisés (création des graphes fonctionnels par exemple) ont été nécessaires pour arriver à mettre en oeuvre ces fonctions.
+
+Dans ce repository, la partie relative à la GUI est dans le dossier \textit{app} et la partie relative à l'entraînement des réseaux est dans le dossier \textit{engine}.
 
 \appendix
 \end{document}
