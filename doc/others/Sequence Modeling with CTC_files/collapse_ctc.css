@@ -1,0 +1,102 @@
+
+#alignment {
+  font-size: 2vw;
+  width: 96%;
+  height: 7vw;
+  padding-top: .8vw;
+  padding-left: 1vw;
+  outline: none;
+  white-space: pre;
+  border: solid .15vw #e3e3e3;
+  border-radius: .5vw;
+  background-color: #f3f3f3;
+  line-height: 6vw;
+}
+
+.caption_text {
+    font-size: 1.4vw;
+}
+
+.return_text {
+    font-size: 1.1vw;
+}
+
+@media(min-width: 1280px) {
+ .caption_text {
+     font-size: 14px;
+  }
+ .return_text {
+     font-size: 12px;
+  }
+}
+
+@media(min-width: 768px) and (max-width: 1280px) {
+ .caption_text {
+     font-size: 1vw;
+  }
+ .return_text {
+     font-size: .8vw;
+  }
+}
+
+#alignment #red_bar_overflow {
+  width: .2vw; 
+  height: 2.8vw;
+  border: none;
+  float: left;
+  margin-top:.5vw;
+  background-color: red;
+  opacity: 0.2 !important;
+}
+
+#alignment div {
+  border-bottom: solid .15vw black;
+  float: left;
+  width: 5.87%;
+  height: 7vw;
+  text-align: center;
+  margin-right: .3%;
+}
+
+.align_epsilon {
+  opacity: .4;
+  font-size: 3vw;
+  font-family: KaTeX_Math;
+  font-style: italic;
+}
+
+.align_text {
+  font-size: 3vw;
+  font-weight: 200;
+}
+
+@media(min-width: 768px) {
+    #alignment {
+      height: 4vw;
+      line-height: 4vw;
+    }
+    #alignment div {
+      height: 4vw;
+   }
+   .align_text {
+      font-size: 2vw;
+   }
+  .align_epsilon {
+      font-size: 2vw;
+   }
+}
+
+#return_botton {
+  border: solid .1vw #a3a3a3;
+  padding: 2% 2% 2% 2%;
+  margin-left: 2%;
+  margin-right: 2%;
+  border-radius: .4vw;
+  opacity:.6;
+}
+
+#collapse_output {
+  font-size: 28px;
+  font-weight: 200;
+}
+

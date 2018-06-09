@@ -72,7 +72,7 @@
 
     \begin{figure}[!htb]
         \begin{center}
-            \includegraphics[width=4cm]{logo_enpc.png}
+            \includegraphics[width=4cm]{img/logo_enpc.png}
         \end{center}
     \end{figure}
 
@@ -160,7 +160,7 @@ Le réseau utilisé est un \textit{LSTM bidimmensionnel}, représenté figure \r
 
 \begin{figure}[!h] 
 	\center
-	\includegraphics[width=10cm]{nn.png}
+	\includegraphics[width=10cm]{img/nn.png}
 	\caption{Le réseau utilisé par \texttt{ocropy}}
 	\label{nn}
 \end{figure}
@@ -169,7 +169,7 @@ L'entrée est un \textit{batch} d'images dont la largeur est variable mais la ha
 L'entrée est envoyée dans un \textit{LSTM} qui parcourt l'image de gauche à droite et un autre "renversé" qui la parcourt de droite à gauche. Les deux sorties sont ensuite concaténées pour être envoyées dans un layer \textit{Softmax} pour obtenir les classes. \\
 La fonction de perte utilisée est la \textit{CTC-loss} (\textit{Connectionist Temporal Classification}) qui est une fonction de perte classiquement utilisée pour les réseaux récurrents. Nous reviendrons dessus plus tard.
 
-\subsection{Premiers essais}
+\subsection{Utilisation d'ocropy}
 
 Nous avons dans un premier temps téléchargé et installé \texttt{ocropy}.
 Le but fut d'abord de comprendre comment l'utiliser.
@@ -202,7 +202,7 @@ On peut également visualiser les étapes avec la commande:
 
 \begin{figure}[!h] 
     \center
-    \includegraphics[width=8cm]{screen_output.png}
+    \includegraphics[width=8cm]{img/screen_output.png}
     \caption{Output d'une itération de l'entraînement}
     \label{API}
 \end{figure}
@@ -242,30 +242,6 @@ Un \textit{parsing} avec python permet de récupérer les informations utiles de
 Le temps nécessaire pour effectuer 1000 itérations est d'environ 11 minutes sur l'ordinateur que nous avons utilisé pour notre installation \texttt{ocropy}.
 C'est un portable MSI doté d'une NVIDIA GeForce GTX 1060, le GPU étant le plus important pour entraîner un réseau de neurones.
 
-\begin{figure}[!h] 
-    \center
-    \includegraphics[width=13cm]{error_default.png}
-    \caption{Évolution de l'erreur sur les données comportant des caractères spéciaux.}
-    \label{err_default}
-\end{figure}
-
-Le meilleur modèle est obtenu au bout de $50 000$ itérations, et atteint une erreur de $9.811\%$.
-Ces résultats sont corrects aux vues de la complexité des données, mais nous pensons pouvoir faire mieux.
-
-\begin{table}[!h]
-    \centering
-    \begin{tabular}{|l|l|lc|l|l|}
-        \hline
-        \multicolumn{6}{|c|}{\cellcolor[gray]{0.8}Statistics of the model} \\ \hline
-        \multicolumn{3}{|l|}{errors}    & \multicolumn{3}{c|}{329}         \\ \hline
-        \multicolumn{3}{|l|}{missing}   & \multicolumn{3}{c|}{35}          \\ \hline
-        \multicolumn{3}{|l|}{total}     & \multicolumn{3}{c|}{3547}        \\ \hline
-        \multicolumn{3}{|l|}{err}       & \multicolumn{3}{c|}{9.275 \%}    \\ \hline
-        \multicolumn{3}{|l|}{errnomiss} & \multicolumn{3}{c|}{8.289 \%}    \\ \hline
-    \end{tabular}
-    \caption{Output de la commande \texttt{ocropus-errs}}
-    \label{t1}
-\end{table}
 
 \subsection{Modification des paramètres d'entraînement}
 
@@ -282,49 +258,53 @@ Le paramètre par défaut est 1000 et est un bon compromis entre la précision d
 
 \texttt{--lrate <Number>} permet de modifier la vitesse d'apprentissage (\textit{learning rate}).
 Un de nos premiers objectifs sera de trouver une bonne valeur de ce paramètre.
+On rappelle que la \textit{learning rate}, vitesse d'apprentissage, ou vitesse d'entraînement, est un hyper-paramètre qui caractérise le pas dans la descente du gradient stochastique présente dans le réseau de neurone.
 
 \texttt{--hiddensize <Number>} permet de modifier un des paramètres de la taille des matrices de notre réseau de neurones.
 Nous nous intéresserons également à son optimisation.
 
 Dans les sous-sections suivantes, nous travaillons avec les données obtenues avec la première normalisation.
 
-\subsubsection{Modification de la \textit{learning rate}}
+\subsubsection{Modification de la taille de cellule}
 
-On rappelle que la \textit{learning rate}, vitesse d'apprentissage, ou vitesse d'entraînement, est un hyper-paramètre qui caractérise le pas dans la descente du gradient stochastique présente dans le réseau de neurone.
-Les courbes figure \ref{err_lrate} comparent les modèles pour la valeur par défaut de la vitesse d'apprentissage, $10^{-3}$, et pour une valeur de $10^{-4}$. 
-
-\begin{figure}[!h] 
-    \center
-    \includegraphics[width=10cm]{error_plot_lrat.png}
-    \caption{Évolution de l'erreur pour deux vitesses d'apprentissage différentes.}
-    \label{err_lrate}
-\end{figure}
-
-On remarque que la courbe au \textit{learning rate} plus faible est plus lente à converger, mais plus régulière.
-En raison de cette stabilité, le meilleur modèle, obtenu pour 133000 itérations a un taux d'erreur de 9.949\% pour la \textit{learning rate} la plus faible, contre 9.275\% au bout de 83000 itérations dans l'autre cas.
-C'est pourquoi nous garderons une \textit{learning rate} de $10^{-3}$ dans la suite.
-
-\subsubsection{Modification de la taille du réseau}
-
-Le paramètre sur lequel on joue ici est le paramètre définissant le nombre de \textit{hidden state}.
+Le paramètre sur lequel on joue ici est le paramètre définissant le nombre de \textit{hidden states}.
 Ce sont les variables que le \textit{LSTM} utilise pour garder une trace du temps.
 C'est la partie récurrente du réseau.
 L'influence de ce paramètre est présentée figure \ref{err_size}.
 
 \begin{figure}[!h] 
     \center
-    \includegraphics[width=10cm]{error_plot_size.png}
-    \caption{Évolution de l'erreur pour deux tailles de réseau différentes.}
+    \includegraphics[width=8cm]{img/curve_100.png}
+    \caption{Évolution de l'erreur pour \textit{hiddensize} = 100.}
     \label{err_size}
 \end{figure}
 
-On remarque que les résultats sont meilleurs quand on augmente ce paramètre.
-La convergence est un peu plus lente en nombre d'itérations, cependant, nous sommes passé de 12 à 18 minutes de temps de calcul nécessaire pour effectuer 1000 itérations.
-Le meilleur modèle que nous avons obtenu a une erreur de 7.976\%, atteinte pour 95000 itérations, soit plus d'un jour d'entraînement. 
+\begin{figure}[!h] 
+	\center
+	\includegraphics[width=8cm]{img/curve_200.png}
+	\caption{Évolution de l'erreur pour \textit{hiddensize} = 200.}
+	\label{err_size}
+\end{figure}
 
-% Nouvelle courbe d'erreur avec lrate améliorée
-% Matrice de confusions pour les caractères spéciaux
+\begin{figure}[!h] 
+	\center
+	\includegraphics[width=8cm]{img/curve_500.png}
+	\caption{Évolution de l'erreur pour \textit{hiddensize} = 500.}
+	\label{err_size}
+\end{figure}
+
+A priori, plus la taille du réseau est grande, meilleurs sont les résultats. Cependant, on sur-apprend notamment pour le réseau de taille 500. De plus, le temps pour entraîner est multiplié par $1.5$ quand on multiplie par 2 la taille du réseau.
+
+\begin{figure}[!h] 
+	\center
+	\includegraphics[width=6cm]{img/curves.png}
+	\caption{Comparaison des meilleurs modèles obtenus selon les tailles de cellule.}
+	\label{err_size}
+\end{figure}
+
+
 \FloatBarrier
+\newpage
 \newpage
 
 \section{Tesseract}
