@@ -2,6 +2,7 @@
 
 # data/
 neuralnetworks/MNIST-data/
+data/
 
 # latex
 *.out
