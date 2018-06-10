@@ -22,3 +22,10 @@ La théorie sur la ctc-loss est les RNN est détaillée dans les slides, se réf
 
 Enfin, l'app Pyqt4 a été développée dans un autre repository : 
 https://github.com/GuillaumeDesforges/simple-ocr
+
+## Bibliographie
+
+* Hannun, "Sequence Modeling with CTC", Distill, 2017. https://distill.pub/2017/ctc/
+* A. Graves, S. Fernandez, F. Gomez, J. Schmidhuber, "Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks", 2006
+* J-B. Camps, "Homemade manuscript OCR (1): OCRopy", Sacré Gr@@l, 2017, https://graal.hypotheses.org/786
+* C. Olah, "Understanding LSTM Networks", 2015, http://colah.github.io/posts/2015-08-Understanding-LSTMs/
