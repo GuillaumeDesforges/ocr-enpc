@@ -408,19 +408,19 @@ Nous avons ensuite implémenté une solution d'OCR. Le GitHub est publique :
 
 Une des difficulté a été d'utiliser les fonctions relative à la CTC (la loss et le décodage).
 Leur utilisation n'est en effet pas direct comme les autres fonctions et couches, et elles sont peu documentées.
-Lors de la création du modèle, Keras créer un graphe.
+Lors de la création du modèle, Keras crée un graphe.
 Pendant la construction de ce graphe, il faut faire attention à n'utiliser que des fonctions "symboliques".
 Une compréhension de cette construction a été nécessaire pour arriver à mettre en oeuvre ces fonctions.
 
 Ainsi, on obtient dans notre graphe une couche \textit{loss} et une couche \textit{decoded} qui contiennent respectivement la CTC Loss et la séquence décodée.
 
-On met en effet la loss dans une couche car les loss de Keras sont des fonctions de signature \texttt{loss(y\_true, y\_pred}, tandis que la CTC Loss néécessite quatre arguments (\texttt{y\_true}, \texttt{y\_ped}, \texttt{label\_lengths}, \texttt{input\_widths}).
+On met en effet la loss dans une couche car les loss de Keras sont des fonctions de signature \texttt{loss(y\_true, y\_pred)}, tandis que la CTC Loss néécessite quatre arguments (\texttt{y\_true}, \texttt{y\_ped}, \texttt{label\_lengths}, \texttt{input\_widths}).
 L'astuce consiste à indiquer comme loss \texttt{\{'loss': lambda y\_true, y\_pred: y\_pred\}}.
 Keras comprends ici que l'on doit prendre la valeur dans la couche \textit{loss} comme une valeur de prédiction \texttt{y\_pred} et que la loss correspond à retourner cette valeur.
-Dans ce cas, Keras va ignorer l'autre sortie \texttt{decoded}.
+Dans ce cas, Keras va ignorer l'autre sortie \texttt{decoded} pendant l'entraînement, qui permettra d'éviter un calcul long et inutile.
 
 Pour le décodeur, on peut utiliser deux méthodes, la méthode \textit{greedy} prenant simplement le merge de l'alignement le plus probable, ou la méthode \textit{Beam Search} qui cherche le label de sortie le plus probable.
-La méthode gloutonne est la plus efficace à calculer et peu servir de première approximation, mais la méthode \textit{beam search} est à utiliser en production.
+La méthode gloutonne est la plus efficace à calculer et peut servir de première approximation, mais la méthode \textit{beam search} est à utiliser en production.
 
 Dans ce repository, la partie relative à la GUI est dans le dossier \textit{app} et la partie relative à l'entraînement des réseaux est dans le dossier \textit{engine}.
 
@@ -434,7 +434,7 @@ Il est sûrement possible de faire coexister TensorFlow et Qt dans deux threads 
 \end{itemize}
 
 Pour améliorer la rapidité de l'entraînement, et étant donné que nous utilisions le backend TensorFlow, nous avons utilisé une couche \texttt{CuDNNLSTM} qui utilise la carte graphique.
-L'entraînement est en moyenne 250 fois plus rapide avec cette couche accélérée : quatre heures deviennent une minute !
+L'entraînement est bien plus rapide avec une couche accélérée : on peut avoir des facteurs d'amélioration supérieurs à dix !
 
 \section{Résultats}
 
@@ -460,5 +460,28 @@ Notre utilisation de l'accélération GPU permet en effet d'arriver à des résu
 
 Nous montrons l'intérêt de réimplémenter une solution OCR avec un framework de deep learning utilisant l'accélération matérielle : le gain de temps peut être considérable.
 
+\chapter*{Conclusions}
+
+Si des solutions OpenSource de reconnaissance automatique de caractères basées sur les réseaux de neurones existent déjà, celles-ci possèdent souvent une dette technique ou un manque d'optimisation.
+Leur utilisation est souvent peu adaptée à la reconnaissance de manuscrit anciens car il faut entraîner un nouveau réseau du début.
+Le paysage actuelle de solutions laisse de la place pour de nouvelles propositions.
+
+Notre projet a voulu s'orienter vers cette direction.
+Dans ce projet, nous avons pu appréhender les concepts théoriques relatifs à ce problème et implémenter un exemple de solution.
+Nous avons cependant manqué d'une part de temps, et d'autre part de connaissance et d'expertise dans ce domaine.
+Le problème de la reconnaissance automatique de caractère est un problème complexe, et si le deep learning propose des solutions simplifiant à priori ce problème et la façon de le poser, il n'en rajoute pas moins des difficultés qui lui sont inhérentes.
+En effet, si un modèle n'arrive pas à apprendre ou si un modèle ayant appris donne de mauvais résultats, la grande diversité de facteurs pouvant provoquer cela, et le fait qu'un réseau de neurones fonctionne en boite noire complexifient la compréhension de ces difficultés.
+
+La création de solutions d'OCR qui seraient OpenSource, modernes, performantes et flexibles serait bénéfique pour de nombreuses applications, dans la recherche et dans l'industrie.
+
+\chapter{Bibliographie}
+
+\begin{itemize}
+	\item Hannun, "Sequence Modeling with CTC", Distill, 2017. https://distill.pub/2017/ctc/
+	\item A. Graves, S. Fernandez, F. Gomez, J. Schmidhuber, "Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks", 2006
+	\item J-B. Camps, "Homemade manuscript OCR (1): OCRopy", Sacré Gr@@l, 2017, https://graal.hypotheses.org/786
+	\item C. Olah, "Understanding LSTM Networks", 2015, http://colah.github.io/posts/2015-08-Understanding-LSTMs/
+\end{itemize}
+		
 \appendix
 \end{document}
