@@ -1,20 +1,37 @@
 \documentclass{report}
 
+% francais
 \usepackage[utf8]{inputenc}
 \usepackage[french]{babel}
+
+% police
 \usepackage{dsfont}
 \usepackage{bbm}
+
 \usepackage{ulem}
+
 \usepackage{stmaryrd}
+
 \usepackage{upquote}
+
 \usepackage{microtype}
+
 \usepackage{graphicx}
+
 \usepackage{calc}
+
 \usepackage{enumitem}
+
+% maths
 \usepackage{amssymb}
+
+% schemas
 \usepackage{tikz}
+
 \usepackage{hyperref}
+
 \usepackage{xcolor}
+
 \usepackage{colortbl}
 \usepackage[section]{placeins}
 
@@ -276,21 +293,21 @@ L'influence de ce paramètre est présentée figure \ref{err_size}.
     \center
     \includegraphics[width=8cm]{img/curve_100.png}
     \caption{Évolution de l'erreur pour \textit{hiddensize} = 100.}
-    \label{err_size}
+    \label{err_size100}
 \end{figure}
 
 \begin{figure}[!h] 
 	\center
 	\includegraphics[width=8cm]{img/curve_200.png}
 	\caption{Évolution de l'erreur pour \textit{hiddensize} = 200.}
-	\label{err_size}
+	\label{err_size200}
 \end{figure}
 
 \begin{figure}[!h] 
 	\center
 	\includegraphics[width=8cm]{img/curve_500.png}
 	\caption{Évolution de l'erreur pour \textit{hiddensize} = 500.}
-	\label{err_size}
+	\label{err_size500}
 \end{figure}
 
 A priori, plus la taille du réseau est grande, meilleurs sont les résultats. Cependant, on sur-apprend notamment pour le réseau de taille 500. De plus, le temps pour entraîner est multiplié par $1.5$ quand on multiplie par 2 la taille du réseau.
@@ -299,7 +316,7 @@ A priori, plus la taille du réseau est grande, meilleurs sont les résultats. C
 	\center
 	\includegraphics[width=6cm]{img/curves.png}
 	\caption{Comparaison des meilleurs modèles obtenus selon les tailles de cellule.}
-	\label{err_size}
+	\label{err_size_compare}
 \end{figure}
 
 
@@ -381,19 +398,67 @@ Si nécessaire, nous pouvons ré-expliquer ici son fonctionnement.
 \section{Développement avec Keras}
 
 Keras est un wrapper pour faire des architectures de Deep Learning, fonctionnant avec TensorFlow, Theano et CNTK.
-Nous avons choisi ce module car sa modularité avec plusieurs \emph{backends} le rend très portable, ce qui est important si l'on veut développer une solution elle-même portable et utilisable par une majorité de personnes.
+Nous avons choisi ce module car sa modularité avec plusieurs \textit{backends} le rend très portable, ce qui est important si l'on veut développer une solution elle-même portable et utilisable par une majorité de personnes.
 
 Des expérimentations sont disponibles dans le dossier \textit{neuralnetworks} du repository du projet.
 
-Nous avons ensuite implémenter une solution d'OCR. Le github est publique :
+Nous avons ensuite implémenté une solution d'OCR. Le GitHub est publique :
 
-https://github.com/GuillaumeDesforges/simple-ocr
+\url{https://github.com/GuillaumeDesforges/simple-ocr}
 
 Une des difficulté a été d'utiliser les fonctions relative à la CTC (la loss et le décodage).
 Leur utilisation n'est en effet pas direct comme les autres fonctions et couches, et elles sont peu documentées.
-Une compréhension des calculs réalisés (création des graphes fonctionnels par exemple) ont été nécessaires pour arriver à mettre en oeuvre ces fonctions.
+Lors de la création du modèle, Keras créer un graphe.
+Pendant la construction de ce graphe, il faut faire attention à n'utiliser que des fonctions "symboliques".
+Une compréhension de cette construction a été nécessaire pour arriver à mettre en oeuvre ces fonctions.
+
+Ainsi, on obtient dans notre graphe une couche \textit{loss} et une couche \textit{decoded} qui contiennent respectivement la CTC Loss et la séquence décodée.
+
+On met en effet la loss dans une couche car les loss de Keras sont des fonctions de signature \texttt{loss(y\_true, y\_pred}, tandis que la CTC Loss néécessite quatre arguments (\texttt{y\_true}, \texttt{y\_ped}, \texttt{label\_lengths}, \texttt{input\_widths}).
+L'astuce consiste à indiquer comme loss \texttt{\{'loss': lambda y\_true, y\_pred: y\_pred\}}.
+Keras comprends ici que l'on doit prendre la valeur dans la couche \textit{loss} comme une valeur de prédiction \texttt{y\_pred} et que la loss correspond à retourner cette valeur.
+Dans ce cas, Keras va ignorer l'autre sortie \texttt{decoded}.
+
+Pour le décodeur, on peut utiliser deux méthodes, la méthode \textit{greedy} prenant simplement le merge de l'alignement le plus probable, ou la méthode \textit{Beam Search} qui cherche le label de sortie le plus probable.
+La méthode gloutonne est la plus efficace à calculer et peu servir de première approximation, mais la méthode \textit{beam search} est à utiliser en production.
 
 Dans ce repository, la partie relative à la GUI est dans le dossier \textit{app} et la partie relative à l'entraînement des réseaux est dans le dossier \textit{engine}.
+
+Nous avons essayé de threader l'apprentissage afin d'avoir la GUI et l'apprentissage qui puisse coexister.
+Rapidement, nos premiers essais nous ont montré qu'il y avait de nombreuses difficultés liées au fonctionnement interne des librairies.
+Il est sûrement possible de faire coexister TensorFlow et Qt dans deux threads séparés, mais nous avons remarqué que :
+\begin{itemize}
+	\item TensorFlow ne voulait pas se lancer dans un \texttt{PyQt.QtCore.QThread}, ce qui empêchait d'utiliser les signaux pour intéragir avec l'entraînement (le mettre en pause ou l'arrêter);
+	\item On pouvait alors utiliser dans certaines conditions \texttt{threading.Thread} pour ne pas bloquer la GUI pendant l'entraînement, mais cela pouvait induire des bugs;
+	\item On pouvait cependant utiliser des \textit{callbacks} de Keras, ce que nous avons fait notamment pour afficher des résultats intermédiaires au cours de l'entraînement.
+\end{itemize}
+
+Pour améliorer la rapidité de l'entraînement, et étant donné que nous utilisions le backend TensorFlow, nous avons utilisé une couche \texttt{CuDNNLSTM} qui utilise la carte graphique.
+L'entraînement est en moyenne 250 fois plus rapide avec cette couche accélérée : quatre heures deviennent une minute !
+
+\section{Résultats}
+
+Sur le dataset \textit{Bodmer}, on obtient l'entraînement suivant :
+
+\begin{figure}[!htb]
+	\begin{center}
+		\includegraphics[width=0.7\linewidth]{img/keras-traincurve.png}
+	\end{center}
+\end{figure}
+
+Le modèle donne des résultats assez satisfaisants :
+
+\begin{figure}[!htb]
+	\begin{center}
+		\includegraphics[width=0.7\linewidth]{img/screenshot-gui.png}
+	\end{center}
+\end{figure}
+
+Nous n'avons pas eu le temps de faire une étude comparative entre notre solution et ocropy, cependant le temps d'entraînement pour arriver à des résultats comparables est très différent d'une solution à l'autre.
+
+Notre utilisation de l'accélération GPU permet en effet d'arriver à des résultats cohérents en une demi-heure, tandis que les premiers résultats intéressant apparaissent au bout de six pour ocropy (taille de cellule 200 pour les deux).
+
+Nous montrons l'intérêt de réimplémenter une solution OCR avec un framework de deep learning utilisant l'accélération matérielle : le gain de temps peut être considérable.
 
 \appendix
 \end{document}
