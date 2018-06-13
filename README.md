@@ -24,6 +24,12 @@ https://github.com/GuillaumeDesforges/simple-ocr
 
 Nous avons principalement utilisé comme données d'entraînement les manuscrits de la *Chanson d'Otinel* de Bodmer, qui nous avaient été fournis.
 
+
+## Données 
+
+Les données nous ont été gracieusement fournies par Jean-Bastie Camps, les transcriptions sont disponibles sur le repository suivant : https://github.com/Jean-Baptiste-Camps/Gest
+Nous avons travaillé sur la chanson d'Otinel de Bodmer, en prenant les 3 dernières pages comme ensemble de test (et le reste pour l'entraînement)
+
 ## Bibliographie
 
 * Hannun, "Sequence Modeling with CTC", Distill, 2017. https://distill.pub/2017/ctc/
