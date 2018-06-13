@@ -27,8 +27,9 @@ Nous avons principalement utilisé comme données d'entraînement les manuscrits
 
 ## Données 
 
-Les données nous ont été gracieusement fournies par Jean-Bastie Camps, les transcriptions sont disponibles sur le repository suivant : https://github.com/Jean-Baptiste-Camps/Gest
-Nous avons travaillé sur la chanson d'Otinel de Bodmer, en prenant les 3 dernières pages comme ensemble de test (et le reste pour l'entraînement)
+Les données nous ont été gracieusement fournies par Jean-Bastie Camps, les transcriptions sont disponibles sur le repository suivant : https://github.com/Jean-Baptiste-Camps/Gest.
+
+Nous avons travaillé sur la chanson d'Otinel de Bodmer, en prenant les 3 dernières pages comme ensemble de test (et le reste pour l'entraînement).
 
 ## Bibliographie
 
